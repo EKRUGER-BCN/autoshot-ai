@@ -14,14 +14,20 @@ st.set_page_config(
     page_title="Autoshot",
     page_icon="⊙",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
+    # Force light theme
 )
 
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
 
-html, body, [data-testid="stAppViewContainer"] {
+/* ── Force light theme everywhere ── */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stAppViewBlockContainer"],
+section[data-testid="stMain"],
+.main, .stApp {
     font-family: 'DM Sans', sans-serif !important;
     background: #ffffff !important;
     color: #0a0a0a !important;
@@ -31,6 +37,22 @@ html, body, [data-testid="stAppViewContainer"] {
 .block-container { padding: 0 !important; max-width: 100% !important; }
 [data-testid="stSidebar"] { display: none !important; }
 
+/* ── Force all Streamlit elements to light ── */
+.stSelectbox > div, .stTextInput > div,
+div[data-baseweb="select"], div[data-baseweb="input"],
+div[data-baseweb="popover"] {
+    background: #ffffff !important;
+    color: #0a0a0a !important;
+}
+div[data-baseweb="select"] * { color: #0a0a0a !important; background: #fff !important; }
+div[data-baseweb="popover"] { background: #fff !important; border: 1px solid #e8e8e8 !important; border-radius: 10px !important; box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important; }
+div[data-baseweb="menu"] { background: #fff !important; }
+div[data-baseweb="menu"] li { color: #0a0a0a !important; background: #fff !important; }
+div[data-baseweb="menu"] li:hover { background: #f8f8f8 !important; }
+div[data-baseweb="select"] > div { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; background: #fff !important; font-family: 'DM Sans', sans-serif !important; font-size: 13px !important; }
+div[data-baseweb="select"] > div:focus-within { border-color: #0a0a0a !important; box-shadow: none !important; }
+
+/* ── Nav ── */
 .as-nav {
     background: #ffffff; border-bottom: 1px solid #f0f0f0;
     padding: 0 48px; height: 60px;
@@ -40,81 +62,95 @@ html, body, [data-testid="stAppViewContainer"] {
 .as-logo-tag { font-size: 9px; letter-spacing: 0.22em; color: #ccc; text-transform: uppercase; margin-top: 2px; font-weight: 300; }
 .as-page { max-width: 1140px; margin: 0 auto; padding: 0 48px 80px; }
 
+/* ── Step headers ── */
 .as-step { display: flex; align-items: center; gap: 12px; margin: 48px 0 24px; }
 .as-step-num {
     width: 26px; height: 26px; border-radius: 50%;
     border: 1px solid #0a0a0a;
     display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 500; flex-shrink: 0;
+    font-size: 11px; font-weight: 500; flex-shrink: 0; color: #0a0a0a;
 }
-.as-step-title { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+.as-step-title { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; color: #0a0a0a; }
 .as-field-label { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #bbb; display: block; margin-bottom: 8px; }
 
+/* ── Selectbox label ── */
+.stSelectbox label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
+.stTextInput label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
+.stTextInput input { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; font-family: 'DM Mono', monospace !important; font-size: 14px !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; background: #fff !important; color: #0a0a0a !important; }
+
+/* ── Photo upload slot ── */
+.as-slot-wrap { position: relative; }
 .as-photo-slot {
     border: 1.5px dashed #e0e0e0; border-radius: 14px; aspect-ratio: 4/3;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; background: #fff; padding: 16px 12px; text-align: center;
+    background: #ffffff; padding: 16px 12px; text-align: center;
+    transition: border-color 0.2s;
 }
-.as-slot-active { border-color: #0a0a0a !important; background: #fafafa !important; }
+.as-slot-active { border-color: #0a0a0a; background: #fafafa; }
+.as-slot-done { border-color: #0a0a0a; border-style: solid; }
 .as-slot-label { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #0a0a0a; margin-top: 12px; }
 .as-slot-label-muted { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #ccc; margin-top: 12px; }
 .as-slot-hint { font-size: 9px; color: #ccc; margin-top: 4px; line-height: 1.5; }
+.as-slot-done-label { font-size: 9px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: #2d7d3a; margin-top: 6px; }
 
+/* ── Hide Streamlit file uploader default UI, show only as invisible overlay ── */
+.slot-uploader .stFileUploader { margin: 0 !important; padding: 0 !important; }
+.slot-uploader [data-testid="stFileUploader"] { margin: 0 !important; }
+.slot-uploader [data-testid="stFileUploaderDropzone"] {
+    border: none !important; background: transparent !important;
+    padding: 0 !important; margin: 0 !important; min-height: 0 !important;
+    position: absolute !important; inset: 0 !important; opacity: 0 !important;
+    cursor: pointer !important; z-index: 10 !important;
+}
+.slot-uploader label { display: none !important; }
+.slot-uploader [data-testid="stFileUploaderDropzoneInstructions"] { display: none !important; }
+.slot-uploader small { display: none !important; }
+.slot-uploader button { display: none !important; }
+.slot-uploader [data-testid="stFileUploaderFileName"] { display: none !important; }
+
+/* ── Analyse button ── */
+div[data-testid="stButton"] button {
+    background: #0a0a0a !important; color: #fff !important;
+    border: none !important; border-radius: 10px !important;
+    padding: 14px 44px !important; font-size: 13px !important;
+    font-weight: 500 !important; font-family: 'DM Sans', sans-serif !important;
+    letter-spacing: 0.06em !important; width: 100% !important;
+    transition: background 0.15s !important;
+}
+div[data-testid="stButton"] button:hover { background: #222 !important; }
+div[data-testid="stButton"] button:disabled { background: #e8e8e8 !important; color: #bbb !important; }
+
+/* ── Results ── */
 .as-divider { height: 1px; background: #f0f0f0; margin: 48px 0 0; }
-
 .as-vehicle-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 26px 28px; }
-.as-vc-make { font-size: 22px; font-weight: 300; letter-spacing: -0.5px; }
+.as-vc-make { font-size: 22px; font-weight: 300; letter-spacing: -0.5px; color: #0a0a0a; }
 .as-vc-detail { font-size: 12px; color: #aaa; margin-top: 4px; font-weight: 300; }
 .as-vc-div { height: 1px; background: #f5f5f5; margin: 18px 0; }
 .as-vc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
 .as-vc-lbl { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; }
 .as-vc-val { font-size: 13px; font-weight: 400; font-family: 'DM Mono', monospace; color: #0a0a0a; }
 .as-vc-val-red { font-size: 13px; font-weight: 400; font-family: 'DM Mono', monospace; color: #cc0000; }
-
 .as-dmg-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
 .as-dmg-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .as-dmg-name { font-size: 12px; color: #0a0a0a; flex: 1; text-transform: capitalize; }
 .as-dmg-cost { font-size: 11px; color: #999; font-family: 'DM Mono', monospace; }
-
 .as-offer-card {
     background: #0a0a0a; border-radius: 14px; padding: 30px 32px;
     display: flex; flex-direction: column; justify-content: space-between; min-height: 340px;
 }
-.as-oc-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #444; }
+.as-oc-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #555; }
 .as-oc-offer { font-size: 52px; font-weight: 300; color: #fff; letter-spacing: -2px; line-height: 1; margin: 14px 0 6px; }
-.as-oc-sub { font-size: 11px; color: #444; letter-spacing: 0.04em; }
+.as-oc-sub { font-size: 11px; color: #555; letter-spacing: 0.04em; }
 .as-oc-div { height: 1px; background: #1a1a1a; margin: 20px 0; }
 .as-oc-row { display: flex; justify-content: space-between; margin-bottom: 9px; }
-.as-oc-rlbl { font-size: 10px; color: #555; letter-spacing: 0.04em; }
-.as-oc-rval { font-size: 10px; color: #888; font-family: 'DM Mono', monospace; }
+.as-oc-rlbl { font-size: 10px; color: #555; }
+.as-oc-rval { font-size: 10px; color: #777; font-family: 'DM Mono', monospace; }
 .as-oc-rval-red { font-size: 10px; color: #cc4444; font-family: 'DM Mono', monospace; }
-
 .as-clean { background: #f0faf2; border: 1px solid #c3e6cb; border-radius: 8px; padding: 12px 18px; color: #2d7d3a; font-size: 12px; margin-bottom: 20px; }
 .as-damaged { background: #fff8f0; border: 1px solid #fdd9b5; border-radius: 8px; padding: 12px 18px; color: #b45309; font-size: 12px; margin-bottom: 20px; }
-.as-note { font-size: 10px; color: #ccc; margin-top: 8px; line-height: 1.5; font-weight: 300; }
-
-.as-footer {
-    border-top: 1px solid #f0f0f0; padding: 14px 48px; background: #fff;
-    font-size: 9px; letter-spacing: 0.16em; color: #ccc; text-transform: uppercase;
-    display: flex; justify-content: space-between;
-}
-
+.as-note { font-size: 10px; color: #ccc; margin-top: 8px; line-height: 1.5; }
+.as-footer { border-top: 1px solid #f0f0f0; padding: 14px 48px; background: #fff; font-size: 9px; letter-spacing: 0.16em; color: #ccc; text-transform: uppercase; display: flex; justify-content: space-between; }
 div[data-testid="stImage"] img { border-radius: 10px !important; border: 1px solid #f0f0f0 !important; }
-.stSelectbox label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
-div[data-baseweb="select"] > div { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; background: #fff !important; font-family: 'DM Sans', sans-serif !important; font-size: 13px !important; }
-div[data-baseweb="select"] > div:focus-within { border-color: #0a0a0a !important; box-shadow: none !important; }
-.stTextInput input { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; font-family: 'DM Mono', monospace !important; font-size: 14px !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; }
-.stTextInput label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
-.stFileUploader > div { border: 1.5px dashed #e0e0e0 !important; border-radius: 14px !important; background: #fff !important; }
-.stFileUploader label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
-div[data-testid="stButton"] button {
-    background: #0a0a0a !important; color: #fff !important; border: none !important;
-    border-radius: 10px !important; padding: 14px 44px !important;
-    font-size: 13px !important; font-weight: 500 !important;
-    font-family: 'DM Sans', sans-serif !important; letter-spacing: 0.06em !important;
-}
-div[data-testid="stButton"] button:hover { background: #222 !important; }
-div[data-testid="stButton"] button:disabled { background: #e0e0e0 !important; color: #bbb !important; cursor: not-allowed !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -125,13 +161,10 @@ ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLASS_NAMES   = ['dent','scratch','crack','glass shatter','lamp broken','tire flat','paint damage']
 
 SEVERITY = {
-    'dent':          ('Medium',  '#fb923c'),
-    'scratch':       ('Low',     '#d4a843'),
-    'crack':         ('High',    '#f87171'),
-    'glass shatter': ('Critical','#cc0000'),
-    'lamp broken':   ('High',    '#f87171'),
-    'tire flat':     ('Critical','#cc0000'),
-    'paint damage':  ('Low',     '#d4a843'),
+    'dent':('Medium','#fb923c'), 'scratch':('Low','#d4a843'),
+    'crack':('High','#f87171'), 'glass shatter':('Critical','#cc0000'),
+    'lamp broken':('High','#f87171'), 'tire flat':('Critical','#cc0000'),
+    'paint damage':('Low','#d4a843'),
 }
 REPAIR = {
     'es': {'dent':(150,400),'scratch':(80,220),'crack':(200,500),'glass shatter':(300,900),'lamp broken':(150,600),'tire flat':(80,200),'paint damage':(200,500)},
@@ -143,50 +176,49 @@ REPAIR = {
 SYM   = {'es':'€','pt':'€','br':'R$','us':'$','mx':'MX$'}
 CNAME = {'es':'Spain','pt':'Portugal','br':'Brazil','us':'United States','mx':'México'}
 CFLAG = {
-    'es': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg',
-    'pt': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg',
-    'br': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg',
-    'us': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg',
-    'mx': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg',
+    'es':'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg',
+    'pt':'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg',
+    'br':'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg',
+    'us':'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg',
+    'mx':'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg',
 }
 
-SVG_FRONT = """<svg width="90" height="52" viewBox="0 0 90 52" fill="none">
-  <rect x="8" y="20" width="74" height="24" rx="4" stroke="{c}" stroke-width="1.3"/>
-  <path d="M20 20 L30 8 L60 8 L70 20" stroke="{c}" stroke-width="1.3" fill="none"/>
-  <circle cx="22" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
-  <circle cx="68" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
-  <rect x="10" y="24" width="18" height="9" rx="2" fill="{f}"/>
-  <rect x="62" y="24" width="18" height="9" rx="2" fill="{f}"/>
-  <rect x="32" y="22" width="26" height="7" rx="1.5" fill="{f}"/>
-  <circle cx="45" cy="25.5" r="2.5" fill="{a}"/>
+SVG_FRONT = """<svg width="86" height="50" viewBox="0 0 86 50" fill="none">
+  <rect x="7" y="18" width="72" height="22" rx="4" stroke="{c}" stroke-width="1.3"/>
+  <path d="M18 18 L28 7 L58 7 L68 18" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="20" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="66" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="9" y="22" width="17" height="9" rx="2" fill="{f}"/>
+  <rect x="60" y="22" width="17" height="9" rx="2" fill="{f}"/>
+  <rect x="30" y="20" width="26" height="7" rx="1.5" fill="{f}"/>
+  <circle cx="43" cy="23.5" r="2.5" fill="{a}"/>
 </svg>"""
 
-SVG_REAR = """<svg width="90" height="52" viewBox="0 0 90 52" fill="none">
-  <rect x="8" y="20" width="74" height="24" rx="4" stroke="{c}" stroke-width="1.3"/>
-  <path d="M20 20 L30 8 L60 8 L70 20" stroke="{c}" stroke-width="1.3" fill="none"/>
-  <circle cx="22" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
-  <circle cx="68" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
-  <rect x="10" y="24" width="18" height="9" rx="2" fill="{f}"/>
-  <rect x="62" y="24" width="18" height="9" rx="2" fill="{f}"/>
-  <rect x="32" y="29" width="26" height="5" rx="1" fill="{f}"/>
-  <line x1="34" y1="31" x2="56" y2="31" stroke="{c}" stroke-width="0.8" opacity="0.4"/>
+SVG_REAR = """<svg width="86" height="50" viewBox="0 0 86 50" fill="none">
+  <rect x="7" y="18" width="72" height="22" rx="4" stroke="{c}" stroke-width="1.3"/>
+  <path d="M18 18 L28 7 L58 7 L68 18" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="20" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="66" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="9" y="22" width="17" height="9" rx="2" fill="{f}"/>
+  <rect x="60" y="22" width="17" height="9" rx="2" fill="{f}"/>
+  <rect x="30" y="27" width="26" height="5" rx="1" fill="{f}"/>
+  <line x1="32" y1="29" x2="54" y2="29" stroke="{c}" stroke-width="0.8" opacity="0.5"/>
 </svg>"""
 
-SVG_SIDE = """<svg width="100" height="52" viewBox="0 0 100 52" fill="none">
-  <rect x="4" y="22" width="92" height="20" rx="3" stroke="{c}" stroke-width="1.3"/>
-  <path d="M14 22 L24 10 L66 10 L78 22" stroke="{c}" stroke-width="1.3" fill="none"/>
-  <circle cx="22" cy="42" r="6" stroke="{c}" stroke-width="1.3"/>
-  <circle cx="78" cy="42" r="6" stroke="{c}" stroke-width="1.3"/>
-  <rect x="26" y="11" width="18" height="11" rx="2" fill="{f}"/>
-  <rect x="48" y="11" width="16" height="11" rx="2" fill="{f}"/>
-  <line x1="4" y1="32" x2="96" y2="32" stroke="{c}" stroke-width="0.7" opacity="0.2"/>
-  <rect x="80" y="26" width="12" height="6" rx="1" fill="{f}"/>
+SVG_SIDE = """<svg width="96" height="50" viewBox="0 0 96 50" fill="none">
+  <rect x="3" y="20" width="90" height="20" rx="3" stroke="{c}" stroke-width="1.3"/>
+  <path d="M12 20 L22 9 L64 9 L76 20" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="20" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="76" cy="40" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="24" y="10" width="17" height="10" rx="2" fill="{f}"/>
+  <rect x="46" y="10" width="15" height="10" rx="2" fill="{f}"/>
+  <rect x="78" y="24" width="11" height="6" rx="1" fill="{f}"/>
 </svg>"""
 
 def car_svg(template, active=False):
     if active:
-        return template.format(c="#0a0a0a", f="#e8e8e8", a="#cc0000")
-    return template.format(c="#d0d0d0", f="#f5f5f5", a="#e0e0e0")
+        return template.format(c="#0a0a0a", f="#e0e0e0", a="#cc0000")
+    return template.format(c="#d0d0d0", f="#f0f0f0", a="#e8e8e8")
 
 @st.cache_resource
 def load_model():
@@ -203,47 +235,33 @@ def identify_vehicle(image_pil, country_code, sym):
     buf = io.BytesIO()
     image_pil.save(buf, format="JPEG", quality=85)
     img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    country_name = CNAME.get(country_code, "Spain")
-    prompt = f"""You are an automotive expert. Analyse this vehicle photo and respond ONLY with raw JSON — no markdown, no preamble.
+    prompt = f"""You are an automotive expert. Analyse this vehicle photo. Respond ONLY with raw JSON — no markdown.
 
-Return this exact structure:
 {{
   "make": "e.g. Volkswagen",
   "model": "e.g. Golf",
   "year_range": "e.g. 2018-2020",
-  "trim": "e.g. 1.6 TDI Comfortline",
+  "trim": "e.g. 1.6 TDI",
   "fuel": "e.g. Diesel",
   "body": "e.g. Hatchback",
   "market_value_low": 11000,
   "market_value_high": 14500,
   "market_value_mid": 12500,
-  "reasoning": "One sentence on valuation basis."
+  "reasoning": "One sentence."
 }}
 
-Base market values on current {country_name} used car prices ({sym}). Return ONLY the JSON."""
+Use current {CNAME.get(country_code,'Spain')} used car prices ({sym}). Return ONLY the JSON."""
     try:
         resp = requests.post(
             "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json",
-            },
-            json={
-                "model": "claude-sonnet-4-20250514",
-                "max_tokens": 512,
-                "messages": [{
-                    "role": "user",
-                    "content": [
-                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
-                        {"type": "text", "text": prompt}
-                    ]
-                }]
-            },
+            headers={"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+            json={"model": "claude-sonnet-4-20250514", "max_tokens": 512, "messages": [{"role": "user", "content": [
+                {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                {"type": "text", "text": prompt}
+            ]}]},
             timeout=30
         )
-        raw = resp.json()["content"][0]["text"].strip()
-        raw = raw.replace("```json","").replace("```","").strip()
+        raw = resp.json()["content"][0]["text"].strip().replace("```json","").replace("```","").strip()
         return json.loads(raw)
     except Exception:
         return None
@@ -266,7 +284,7 @@ st.markdown("""
       <div class="as-logo-tag">Vehicle Damage Intelligence</div>
     </div>
   </div>
-  <div style="font-size:10px;color:#ccc;letter-spacing:0.08em;font-family:'DM Sans',sans-serif">AI-Powered Assessment</div>
+  <div style="font-size:10px;color:#bbb;letter-spacing:0.08em">AI-Powered Assessment</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -279,47 +297,30 @@ st.markdown("""
 <div class="as-step">
   <div class="as-step-num">1</div>
   <div class="as-step-title">Configure assessment</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
 col1, col2, col3 = st.columns(3, gap="medium")
-
 with col1:
-    st.markdown('<span class="as-field-label">Market</span>', unsafe_allow_html=True)
-    country = st.selectbox(
-        "Market", list(CNAME.keys()),
-        format_func=lambda x: CNAME[x],
-        label_visibility="collapsed", key="country"
-    )
-    st.markdown(f"""
-    <div style="display:flex;align-items:center;gap:8px;margin-top:-6px">
-      <img src="{CFLAG[country]}" style="width:22px;height:15px;border-radius:2px;border:1px solid #f0f0f0;object-fit:cover"/>
-      <span style="font-size:10px;color:#bbb;font-family:'DM Sans',sans-serif;letter-spacing:0.06em">{country.upper()} · {SYM[country]}</span>
+    country = st.selectbox("Market", list(CNAME.keys()), format_func=lambda x: CNAME[x], key="country")
+    st.markdown(f"""<div style="display:flex;align-items:center;gap:8px;margin-top:-8px">
+      <img src="{CFLAG[country]}" style="width:22px;height:15px;border-radius:2px;border:1px solid #eee;object-fit:cover"/>
+      <span style="font-size:10px;color:#bbb;letter-spacing:0.06em">{country.upper()} · {SYM[country]}</span>
     </div>""", unsafe_allow_html=True)
-
 with col2:
-    st.markdown('<span class="as-field-label">License Plate</span>', unsafe_allow_html=True)
-    plate = st.text_input("Plate", placeholder="1234 ABC", label_visibility="collapsed", key="plate")
-
+    plate = st.text_input("License Plate", placeholder="1234 ABC", key="plate")
 with col3:
-    st.markdown('<span class="as-field-label">Dealer Margin</span>', unsafe_allow_html=True)
-    margin = st.selectbox(
-        "Margin", [10, 12, 15, 18, 20, 25], index=2,
-        format_func=lambda x: f"{x}%",
-        label_visibility="collapsed", key="margin"
-    )
+    margin = st.selectbox("Dealer Margin", [10,12,15,18,20,25], index=2, format_func=lambda x: f"{x}%", key="margin")
 
 sym = SYM[country]
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 2 — Upload photos
+# STEP 2 — Upload photos (custom slots with invisible Streamlit uploader overlay)
 # ══════════════════════════════════════════════════════════════════════════════
 st.markdown("""
 <div class="as-step">
   <div class="as-step-num">2</div>
   <div class="as-step-title">Upload vehicle photos</div>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
 
 SLOTS = [
     ("Front",      SVG_FRONT, "Full front view · straight on"),
@@ -334,13 +335,15 @@ uploads = {}
 for i, (label, svg_tpl, hint) in enumerate(SLOTS):
     with photo_cols[i]:
         file = st.file_uploader(
-            label, type=["jpg","jpeg","png","webp"],
-            key=f"slot_{i}", label_visibility="collapsed"
+            label,
+            type=["jpg","jpeg","png","webp"],
+            key=f"slot_{i}",
+            label_visibility="visible"
         )
         uploads[label] = file
+
         if file:
             st.image(Image.open(file), use_container_width=True)
-            st.markdown(f'<div style="text-align:center;margin-top:2px"><span style="font-size:9px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#2d7d3a">✓ {label}</span></div>', unsafe_allow_html=True)
         else:
             active = (i == 0)
             st.markdown(f"""
@@ -350,9 +353,42 @@ for i, (label, svg_tpl, hint) in enumerate(SLOTS):
               <div class="as-slot-hint">{hint}</div>
             </div>""", unsafe_allow_html=True)
 
+# Override Streamlit uploader to be minimal — just show label + browse button cleanly
+st.markdown("""
+<style>
+[data-testid="stFileUploaderDropzone"] {
+    background: #fafafa !important;
+    border: 1.5px dashed #e8e8e8 !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+    min-height: 48px !important;
+}
+[data-testid="stFileUploaderDropzoneInstructions"] { display: none !important; }
+[data-testid="stFileUploaderDropzone"] > div > span { display: none !important; }
+[data-testid="stFileUploaderDropzone"] button {
+    background: #0a0a0a !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 8px 20px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    letter-spacing: 0.06em !important;
+    cursor: pointer !important;
+}
+[data-testid="stFileUploaderDropzone"] small { display: none !important; }
+.stFileUploader label {
+    font-size: 9px !important; font-weight: 500 !important;
+    letter-spacing: 0.18em !important; color: #bbb !important;
+    text-transform: uppercase !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 all_uploads = [f for f in uploads.values() if f is not None]
 
-st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
+st.markdown('<div style="height:12px"></div>', unsafe_allow_html=True)
 _, btn_col, _ = st.columns([2, 1, 2])
 with btn_col:
     analyse = st.button("⊙  Analyse Vehicle", key="analyse", disabled=(len(all_uploads) == 0))
@@ -400,15 +436,11 @@ if analyse or st.session_state.get("show_results"):
                 arr = np.array(img)
                 res = model.predict(arr, conf=0.40, verbose=False)[0]
                 if res.boxes and len(res.boxes) > 0:
-                    all_classes += [
-                        CLASS_NAMES[int(c)] if int(c) < len(CLASS_NAMES) else f"class_{int(c)}"
-                        for c in res.boxes.cls.cpu().numpy()
-                    ]
+                    all_classes += [CLASS_NAMES[int(c)] if int(c) < len(CLASS_NAMES) else f"class_{int(c)}" for c in res.boxes.cls.cpu().numpy()]
                     all_confs += list(res.boxes.conf.cpu().numpy())
                 ann = res.plot(line_width=2, pil=False, img=arr.copy())
                 annotated_imgs.append((f.name, cv2.cvtColor(ann, cv2.COLOR_BGR2RGB)))
 
-        # Annotated images
         if annotated_imgs:
             img_cols = st.columns(min(len(annotated_imgs), 4), gap="small")
             for i, (name, img) in enumerate(annotated_imgs):
@@ -416,14 +448,13 @@ if analyse or st.session_state.get("show_results"):
                     st.image(img, use_container_width=True)
             st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
 
-        # Costs
         costs_table = REPAIR[country]
         total_low, total_high = 0, 0
         counts = Counter(all_classes)
         if all_classes:
             for cls, count in counts.items():
-                low, high   = costs_table.get(cls, (100, 300))
-                total_low  += low * count
+                low, high = costs_table.get(cls, (100,300))
+                total_low += low * count
                 total_high += high * count
 
         repair_mid = (total_low + total_high) // 2
@@ -431,7 +462,6 @@ if analyse or st.session_state.get("show_results"):
         margin_amt = int((market_val - repair_mid) * margin / 100)
         max_offer  = max(0, market_val - repair_mid - margin_amt)
 
-        # Results grid
         left_col, right_col = st.columns(2, gap="medium")
 
         with left_col:
@@ -444,25 +474,15 @@ if analyse or st.session_state.get("show_results"):
                 detail     = "Set ANTHROPIC_API_KEY for AI identification"
                 mv_str     = f"{sym} {market_val:,}"
 
-            if not all_classes:
-                status_html = '<div class="as-clean">✓ No damage detected across all photos</div>'
-                repair_str  = f"{sym} 0"
-            else:
-                n = len(all_uploads)
-                status_html = f'<div class="as-damaged">⚠ {len(all_classes)} damage instance{"s" if len(all_classes)>1 else ""} detected across {n} photo{"s" if n>1 else ""}</div>'
-                repair_str  = f"{sym} {total_low:,} – {total_high:,}"
+            status_html = '<div class="as-clean">✓ No damage detected</div>' if not all_classes else f'<div class="as-damaged">⚠ {len(all_classes)} defect{"s" if len(all_classes)>1 else ""} detected across {len(all_uploads)} photo{"s" if len(all_uploads)>1 else ""}</div>'
+            repair_str  = f"{sym} 0" if not all_classes else f"{sym} {total_low:,} – {total_high:,}"
 
             dmg_html = ""
             if all_classes:
                 for cls, count in sorted(counts.items(), key=lambda x: -x[1]):
                     _, color = SEVERITY.get(cls, ('Medium','#fb923c'))
                     low, high = costs_table.get(cls, (100,300))
-                    dmg_html += f"""
-                    <div class="as-dmg-row">
-                      <div class="as-dmg-dot" style="background:{color}"></div>
-                      <div class="as-dmg-name">{cls} &times;{count}</div>
-                      <div class="as-dmg-cost">{sym} {low*count:,}–{high*count:,}</div>
-                    </div>"""
+                    dmg_html += f'<div class="as-dmg-row"><div class="as-dmg-dot" style="background:{color}"></div><div class="as-dmg-name">{cls} ×{count}</div><div class="as-dmg-cost">{sym} {low*count:,}–{high*count:,}</div></div>'
             else:
                 dmg_html = '<div style="font-size:12px;color:#ccc;padding:10px 0">No defects found</div>'
 
@@ -472,14 +492,8 @@ if analyse or st.session_state.get("show_results"):
               <div class="as-vc-make">{make_model}</div>
               <div class="as-vc-detail">{detail}</div>
               <div class="as-vc-div"></div>
-              <div class="as-vc-row">
-                <span class="as-vc-lbl">Market Value</span>
-                <span class="as-vc-val">{mv_str}</span>
-              </div>
-              <div class="as-vc-row">
-                <span class="as-vc-lbl">Repair Estimate</span>
-                <span class="as-vc-val-red">{repair_str}</span>
-              </div>
+              <div class="as-vc-row"><span class="as-vc-lbl">Market Value</span><span class="as-vc-val">{mv_str}</span></div>
+              <div class="as-vc-row"><span class="as-vc-lbl">Repair Estimate</span><span class="as-vc-val-red">{repair_str}</span></div>
               <div class="as-vc-div"></div>
               {dmg_html}
               <div class="as-note">{CNAME[country]} labour rates · Indicative estimates</div>
@@ -495,29 +509,16 @@ if analyse or st.session_state.get("show_results"):
               </div>
               <div>
                 <div class="as-oc-div"></div>
-                <div class="as-oc-row">
-                  <span class="as-oc-rlbl">Market value</span>
-                  <span class="as-oc-rval">{sym} {market_val:,}</span>
-                </div>
-                <div class="as-oc-row">
-                  <span class="as-oc-rlbl">Repair estimate</span>
-                  <span class="as-oc-rval-red">− {sym} {repair_mid:,}</span>
-                </div>
-                <div class="as-oc-row">
-                  <span class="as-oc-rlbl">Dealer margin {margin}%</span>
-                  <span class="as-oc-rval-red">− {sym} {margin_amt:,}</span>
-                </div>
+                <div class="as-oc-row"><span class="as-oc-rlbl">Market value</span><span class="as-oc-rval">{sym} {market_val:,}</span></div>
+                <div class="as-oc-row"><span class="as-oc-rlbl">Repair estimate</span><span class="as-oc-rval-red">− {sym} {repair_mid:,}</span></div>
+                <div class="as-oc-row"><span class="as-oc-rlbl">Dealer margin {margin}%</span><span class="as-oc-rval-red">− {sym} {margin_amt:,}</span></div>
                 <div style="height:1px;background:#1a1a1a;margin:14px 0"></div>
-                <div style="font-size:9px;color:#333;letter-spacing:0.1em;line-height:1.7;font-family:'DM Sans',sans-serif">
-                  Autoshot · Vehicle Damage Intelligence<br>
-                  Model v12 · mAP 0.601 · 7 damage classes
-                </div>
+                <div style="font-size:9px;color:#444;letter-spacing:0.1em;line-height:1.7">Autoshot · Vehicle Damage Intelligence<br>Model v12 · mAP 0.601 · 7 damage classes</div>
               </div>
             </div>""", unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ── Footer ─────────────────────────────────────────────────────────────────────
 model_name = os.path.basename(os.path.dirname(os.path.dirname(model_path))) if model_path else "No model"
 st.markdown(f"""
 <div class="as-footer">
