@@ -6,6 +6,7 @@ import cv2
 import os
 import base64
 import json
+import io
 import requests
 from collections import Counter
 
@@ -18,7 +19,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
 
 html, body, [data-testid="stAppViewContainer"] {
     font-family: 'DM Sans', sans-serif !important;
@@ -30,323 +31,98 @@ html, body, [data-testid="stAppViewContainer"] {
 .block-container { padding: 0 !important; max-width: 100% !important; }
 [data-testid="stSidebar"] { display: none !important; }
 
-/* ── Nav ── */
 .as-nav {
-    background: #ffffff;
-    border-bottom: 1px solid #f0f0f0;
-    padding: 0 40px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    background: #ffffff; border-bottom: 1px solid #f0f0f0;
+    padding: 0 48px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
 }
-.as-logo-name {
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    color: #0a0a0a;
-    text-transform: uppercase;
-}
-.as-logo-sub {
-    font-size: 9px;
-    letter-spacing: 0.2em;
-    color: #c0c0c0;
-    font-weight: 300;
-    margin-top: 1px;
-    text-transform: uppercase;
-}
-.as-nav-badge {
-    font-size: 10px;
-    background: #f5f5f5;
-    color: #888;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-left: 8px;
-    font-weight: 400;
-}
-.as-nav-badge-red {
-    font-size: 10px;
-    background: #fff0f0;
-    color: #cc0000;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin-left: 8px;
-    font-weight: 400;
-}
+.as-logo-name { font-size: 12px; font-weight: 500; letter-spacing: 0.16em; color: #0a0a0a; text-transform: uppercase; }
+.as-logo-tag { font-size: 9px; letter-spacing: 0.22em; color: #ccc; text-transform: uppercase; margin-top: 2px; font-weight: 300; }
+.as-page { max-width: 1140px; margin: 0 auto; padding: 0 48px 80px; }
 
-/* ── Body grid ── */
-.as-body { display: grid; grid-template-columns: 320px 1fr; min-height: calc(100vh - 60px); }
-.as-left { background: #ffffff; border-right: 1px solid #f0f0f0; padding: 36px 28px; }
-.as-right { background: #fafafa; padding: 36px 40px; }
+.as-step { display: flex; align-items: center; gap: 12px; margin: 48px 0 24px; }
+.as-step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 1px solid #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; flex-shrink: 0;
+}
+.as-step-title { font-size: 13px; font-weight: 500; letter-spacing: 0.04em; }
+.as-field-label { font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: #bbb; display: block; margin-bottom: 8px; }
 
-/* ── Section labels ── */
-.as-lbl {
-    font-size: 9px;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    color: #c0c0c0;
-    text-transform: uppercase;
-    margin-bottom: 12px;
+.as-photo-slot {
+    border: 1.5px dashed #e0e0e0; border-radius: 14px; aspect-ratio: 4/3;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; background: #fff; padding: 16px 12px; text-align: center;
 }
+.as-slot-active { border-color: #0a0a0a !important; background: #fafafa !important; }
+.as-slot-label { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #0a0a0a; margin-top: 12px; }
+.as-slot-label-muted { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #ccc; margin-top: 12px; }
+.as-slot-hint { font-size: 9px; color: #ccc; margin-top: 4px; line-height: 1.5; }
 
-/* ── Vehicle ID card ── */
-.as-vehicle-card {
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
-    border-radius: 12px;
-    padding: 18px 20px;
-    margin-bottom: 20px;
-}
-.as-vehicle-make {
-    font-size: 18px;
-    font-weight: 400;
-    color: #0a0a0a;
-    letter-spacing: -0.3px;
-}
-.as-vehicle-detail {
-    font-size: 12px;
-    color: #999;
-    font-weight: 300;
-    margin-top: 3px;
-}
-.as-vehicle-price {
-    font-size: 22px;
-    font-weight: 300;
-    color: #0a0a0a;
-    margin-top: 12px;
-    letter-spacing: -0.5px;
-}
-.as-vehicle-price-lbl {
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    color: #c0c0c0;
-    text-transform: uppercase;
-    margin-top: 2px;
-}
-.as-vehicle-confidence {
-    display: inline-block;
-    font-size: 9px;
-    background: #f0faf2;
-    color: #2d7d3a;
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-top: 10px;
-    letter-spacing: 0.05em;
-}
+.as-divider { height: 1px; background: #f0f0f0; margin: 48px 0 0; }
 
-/* ── Metrics ── */
-.as-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 24px;
-}
-.as-metric {
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
-    border-radius: 10px;
-    padding: 14px 16px;
-}
-.as-metric-val {
-    font-size: 24px;
-    font-weight: 300;
-    color: #0a0a0a;
-    line-height: 1;
-    letter-spacing: -0.5px;
-}
-.as-metric-val-red {
-    font-size: 24px;
-    font-weight: 300;
-    color: #cc0000;
-    line-height: 1;
-    letter-spacing: -0.5px;
-}
-.as-metric-lbl {
-    font-size: 9px;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    color: #c0c0c0;
-    text-transform: uppercase;
-    margin-top: 5px;
-}
+.as-vehicle-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 14px; padding: 26px 28px; }
+.as-vc-make { font-size: 22px; font-weight: 300; letter-spacing: -0.5px; }
+.as-vc-detail { font-size: 12px; color: #aaa; margin-top: 4px; font-weight: 300; }
+.as-vc-div { height: 1px; background: #f5f5f5; margin: 18px 0; }
+.as-vc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.as-vc-lbl { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #ccc; }
+.as-vc-val { font-size: 13px; font-weight: 400; font-family: 'DM Mono', monospace; color: #0a0a0a; }
+.as-vc-val-red { font-size: 13px; font-weight: 400; font-family: 'DM Mono', monospace; color: #cc0000; }
 
-/* ── Status banner ── */
-.as-clean {
-    background: #f0faf2;
-    border: 1px solid #c3e6cb;
-    border-radius: 8px;
-    padding: 12px 18px;
-    color: #2d7d3a;
-    font-size: 12px;
-    margin-bottom: 20px;
-    letter-spacing: 0.02em;
-}
-.as-damaged {
-    background: #fff8f0;
-    border: 1px solid #fdd9b5;
-    border-radius: 8px;
-    padding: 12px 18px;
-    color: #b45309;
-    font-size: 12px;
-    margin-bottom: 20px;
-    letter-spacing: 0.02em;
-}
+.as-dmg-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+.as-dmg-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.as-dmg-name { font-size: 12px; color: #0a0a0a; flex: 1; text-transform: capitalize; }
+.as-dmg-cost { font-size: 11px; color: #999; font-family: 'DM Mono', monospace; }
 
-/* ── Damage list ── */
-.as-damage-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 0;
-    border-bottom: 1px solid #f5f5f5;
+.as-offer-card {
+    background: #0a0a0a; border-radius: 14px; padding: 30px 32px;
+    display: flex; flex-direction: column; justify-content: space-between; min-height: 340px;
 }
-.as-damage-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.as-damage-name { font-size: 13px; font-weight: 400; color: #0a0a0a; text-transform: capitalize; flex: 1; }
-.as-damage-count { font-size: 11px; color: #c0c0c0; font-family: 'DM Mono', monospace; }
-.as-damage-sev { font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; }
-.as-damage-cost { font-size: 12px; font-weight: 400; color: #0a0a0a; min-width: 110px; text-align: right; font-family: 'DM Mono', monospace; }
+.as-oc-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #444; }
+.as-oc-offer { font-size: 52px; font-weight: 300; color: #fff; letter-spacing: -2px; line-height: 1; margin: 14px 0 6px; }
+.as-oc-sub { font-size: 11px; color: #444; letter-spacing: 0.04em; }
+.as-oc-div { height: 1px; background: #1a1a1a; margin: 20px 0; }
+.as-oc-row { display: flex; justify-content: space-between; margin-bottom: 9px; }
+.as-oc-rlbl { font-size: 10px; color: #555; letter-spacing: 0.04em; }
+.as-oc-rval { font-size: 10px; color: #888; font-family: 'DM Mono', monospace; }
+.as-oc-rval-red { font-size: 10px; color: #cc4444; font-family: 'DM Mono', monospace; }
 
-.as-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 14px 0 0;
-    margin-top: 6px;
-    border-top: 1px solid #0a0a0a;
-}
-.as-total-label { font-size: 9px; font-weight: 500; letter-spacing: 0.16em; color: #0a0a0a; text-transform: uppercase; }
-.as-total-val { font-size: 24px; font-weight: 300; color: #cc0000; letter-spacing: -0.5px; font-family: 'DM Mono', monospace; }
+.as-clean { background: #f0faf2; border: 1px solid #c3e6cb; border-radius: 8px; padding: 12px 18px; color: #2d7d3a; font-size: 12px; margin-bottom: 20px; }
+.as-damaged { background: #fff8f0; border: 1px solid #fdd9b5; border-radius: 8px; padding: 12px 18px; color: #b45309; font-size: 12px; margin-bottom: 20px; }
+.as-note { font-size: 10px; color: #ccc; margin-top: 8px; line-height: 1.5; font-weight: 300; }
 
-/* ── Offer box ── */
-.as-offer {
-    background: #0a0a0a;
-    border-radius: 14px;
-    padding: 26px 30px;
-    margin-top: 28px;
-}
-.as-offer-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; }
-.as-offer-lbl { font-size: 9px; letter-spacing: 0.15em; color: #444; text-transform: uppercase; }
-.as-offer-val { font-size: 13px; font-weight: 300; color: #fff; font-family: 'DM Mono', monospace; }
-.as-offer-val-red { font-size: 13px; font-weight: 300; color: #cc0000; font-family: 'DM Mono', monospace; }
-.as-offer-divider { height: 1px; background: #1a1a1a; margin: 12px 0; }
-.as-offer-total-lbl { font-size: 9px; letter-spacing: 0.18em; color: #555; text-transform: uppercase; }
-.as-offer-total-val { font-size: 38px; font-weight: 300; color: #fff; letter-spacing: -1.5px; }
-
-/* ── Note ── */
-.as-note { font-size: 10px; font-weight: 300; color: #c0c0c0; margin-top: 8px; line-height: 1.5; }
-
-/* ── Empty state ── */
-.as-empty {
-    background: #ffffff;
-    border: 1px solid #f0f0f0;
-    border-radius: 14px;
-    padding: 80px 40px;
-    text-align: center;
-}
-.as-empty-icon { font-size: 32px; opacity: 0.08; margin-bottom: 14px; }
-.as-empty-text { font-size: 13px; font-weight: 300; color: #c0c0c0; letter-spacing: 0.04em; }
-
-/* ── AI thinking ── */
-.as-ai-thinking {
-    background: #f8f8ff;
-    border: 1px solid #e8e8ff;
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 12px;
-    color: #5555aa;
-    margin-bottom: 16px;
-    font-style: italic;
-}
-
-/* ── Footer ── */
 .as-footer {
-    border-top: 1px solid #f0f0f0;
-    padding: 14px 40px;
-    background: #fff;
-    font-size: 9px;
-    letter-spacing: 0.18em;
-    color: #c0c0c0;
-    text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
+    border-top: 1px solid #f0f0f0; padding: 14px 48px; background: #fff;
+    font-size: 9px; letter-spacing: 0.16em; color: #ccc; text-transform: uppercase;
+    display: flex; justify-content: space-between;
 }
 
-/* ── Streamlit widget overrides ── */
-.stFileUploader > div {
-    border: 1px dashed #e8e8e8 !important;
-    border-radius: 10px !important;
-    background: #fafafa !important;
-    padding: 20px !important;
+div[data-testid="stImage"] img { border-radius: 10px !important; border: 1px solid #f0f0f0 !important; }
+.stSelectbox label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
+div[data-baseweb="select"] > div { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; background: #fff !important; font-family: 'DM Sans', sans-serif !important; font-size: 13px !important; }
+div[data-baseweb="select"] > div:focus-within { border-color: #0a0a0a !important; box-shadow: none !important; }
+.stTextInput input { border: 1px solid #e8e8e8 !important; border-radius: 8px !important; font-family: 'DM Mono', monospace !important; font-size: 14px !important; letter-spacing: 0.12em !important; text-transform: uppercase !important; }
+.stTextInput label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
+.stFileUploader > div { border: 1.5px dashed #e0e0e0 !important; border-radius: 14px !important; background: #fff !important; }
+.stFileUploader label { font-size: 9px !important; font-weight: 500 !important; letter-spacing: 0.18em !important; color: #bbb !important; text-transform: uppercase !important; }
+div[data-testid="stButton"] button {
+    background: #0a0a0a !important; color: #fff !important; border: none !important;
+    border-radius: 10px !important; padding: 14px 44px !important;
+    font-size: 13px !important; font-weight: 500 !important;
+    font-family: 'DM Sans', sans-serif !important; letter-spacing: 0.06em !important;
 }
-.stFileUploader label {
-    font-size: 9px !important; font-weight: 500 !important;
-    letter-spacing: 0.18em !important; color: #c0c0c0 !important;
-    text-transform: uppercase !important;
-}
-.stSlider label {
-    font-size: 9px !important; font-weight: 500 !important;
-    letter-spacing: 0.18em !important; color: #c0c0c0 !important;
-    text-transform: uppercase !important;
-}
-.stSlider [role="slider"] { background: #0a0a0a !important; border-color: #0a0a0a !important; }
-.stSelectbox label {
-    font-size: 9px !important; font-weight: 500 !important;
-    letter-spacing: 0.18em !important; color: #c0c0c0 !important;
-    text-transform: uppercase !important;
-}
-div[data-baseweb="select"] > div {
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    background: #ffffff !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 13px !important;
-    font-weight: 400 !important;
-}
-.stNumberInput label {
-    font-size: 9px !important; font-weight: 500 !important;
-    letter-spacing: 0.18em !important; color: #c0c0c0 !important;
-    text-transform: uppercase !important;
-}
-.stNumberInput input {
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    background: #ffffff !important;
-    font-family: 'DM Sans', sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 300 !important;
-    padding: 8px 12px !important;
-}
-.stTextInput input {
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    background: #ffffff !important;
-    font-family: 'DM Mono', monospace !important;
-    font-size: 14px !important;
-    letter-spacing: 0.12em !important;
-    text-transform: uppercase !important;
-    padding: 10px 14px !important;
-}
-.stTextInput label {
-    font-size: 9px !important; font-weight: 500 !important;
-    letter-spacing: 0.18em !important; color: #c0c0c0 !important;
-    text-transform: uppercase !important;
-}
-div[data-testid="stImage"] img {
-    border-radius: 10px !important;
-    border: 1px solid #f0f0f0 !important;
-}
+div[data-testid="stButton"] button:hover { background: #222 !important; }
+div[data-testid="stButton"] button:disabled { background: #e0e0e0 !important; color: #bbb !important; cursor: not-allowed !important; }
 </style>
 """, unsafe_allow_html=True)
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-MODEL_PATH   = os.environ.get("AUTOSHOT_MODEL", "runs/detect/runs/detect/autoshot_combined_v12/weights/best.pt")
-FALLBACK     = "runs/detect/runs/detect/autoshot_v4_final/weights/best.pt"
+MODEL_PATH    = os.environ.get("AUTOSHOT_MODEL", "runs/detect/runs/detect/autoshot_combined_v12/weights/best.pt")
+FALLBACK      = "runs/detect/runs/detect/autoshot_v4_final/weights/best.pt"
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-CLASS_NAMES  = ['dent','scratch','crack','glass shatter','lamp broken','tire flat','paint damage']
-CONF_DEFAULT = 0.40
+CLASS_NAMES   = ['dent','scratch','crack','glass shatter','lamp broken','tire flat','paint damage']
 
 SEVERITY = {
     'dent':          ('Medium',  '#fb923c'),
@@ -365,8 +141,52 @@ REPAIR = {
     'mx': {'dent':(2900,7800),'scratch':(1600,4300),'crack':(3900,9800),'glass shatter':(5800,17500),'lamp broken':(2900,11700),'tire flat':(1600,3900),'paint damage':(3900,9800)},
 }
 SYM   = {'es':'€','pt':'€','br':'R$','us':'$','mx':'MX$'}
-CNAME = {'es':'Spain','pt':'Portugal','br':'Brazil','us':'USA','mx':'México'}
-CFLAG = {'es':'🇪🇸','pt':'🇵🇹','br':'🇧🇷','us':'🇺🇸','mx':'🇲🇽'}
+CNAME = {'es':'Spain','pt':'Portugal','br':'Brazil','us':'United States','mx':'México'}
+CFLAG = {
+    'es': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg',
+    'pt': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg',
+    'br': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg',
+    'us': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg',
+    'mx': 'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg',
+}
+
+SVG_FRONT = """<svg width="90" height="52" viewBox="0 0 90 52" fill="none">
+  <rect x="8" y="20" width="74" height="24" rx="4" stroke="{c}" stroke-width="1.3"/>
+  <path d="M20 20 L30 8 L60 8 L70 20" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="22" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="68" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="10" y="24" width="18" height="9" rx="2" fill="{f}"/>
+  <rect x="62" y="24" width="18" height="9" rx="2" fill="{f}"/>
+  <rect x="32" y="22" width="26" height="7" rx="1.5" fill="{f}"/>
+  <circle cx="45" cy="25.5" r="2.5" fill="{a}"/>
+</svg>"""
+
+SVG_REAR = """<svg width="90" height="52" viewBox="0 0 90 52" fill="none">
+  <rect x="8" y="20" width="74" height="24" rx="4" stroke="{c}" stroke-width="1.3"/>
+  <path d="M20 20 L30 8 L60 8 L70 20" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="22" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="68" cy="44" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="10" y="24" width="18" height="9" rx="2" fill="{f}"/>
+  <rect x="62" y="24" width="18" height="9" rx="2" fill="{f}"/>
+  <rect x="32" y="29" width="26" height="5" rx="1" fill="{f}"/>
+  <line x1="34" y1="31" x2="56" y2="31" stroke="{c}" stroke-width="0.8" opacity="0.4"/>
+</svg>"""
+
+SVG_SIDE = """<svg width="100" height="52" viewBox="0 0 100 52" fill="none">
+  <rect x="4" y="22" width="92" height="20" rx="3" stroke="{c}" stroke-width="1.3"/>
+  <path d="M14 22 L24 10 L66 10 L78 22" stroke="{c}" stroke-width="1.3" fill="none"/>
+  <circle cx="22" cy="42" r="6" stroke="{c}" stroke-width="1.3"/>
+  <circle cx="78" cy="42" r="6" stroke="{c}" stroke-width="1.3"/>
+  <rect x="26" y="11" width="18" height="11" rx="2" fill="{f}"/>
+  <rect x="48" y="11" width="16" height="11" rx="2" fill="{f}"/>
+  <line x1="4" y1="32" x2="96" y2="32" stroke="{c}" stroke-width="0.7" opacity="0.2"/>
+  <rect x="80" y="26" width="12" height="6" rx="1" fill="{f}"/>
+</svg>"""
+
+def car_svg(template, active=False):
+    if active:
+        return template.format(c="#0a0a0a", f="#e8e8e8", a="#cc0000")
+    return template.format(c="#d0d0d0", f="#f5f5f5", a="#e0e0e0")
 
 @st.cache_resource
 def load_model():
@@ -377,24 +197,14 @@ def load_model():
 
 model, model_path = load_model()
 
-# ── Claude Vision: identify vehicle + market value ─────────────────────────────
-def identify_vehicle_with_claude(image_pil, country_code, sym):
-    """Send image to Claude claude-sonnet-4-20250514 for vehicle ID + market value estimate."""
+def identify_vehicle(image_pil, country_code, sym):
     if not ANTHROPIC_KEY:
         return None
-
-    # Encode image to base64
-    import io
     buf = io.BytesIO()
     image_pil.save(buf, format="JPEG", quality=85)
     img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-
     country_name = CNAME.get(country_code, "Spain")
-    currency = sym
-
-    prompt = f"""You are an automotive expert. Look at this vehicle photo and respond ONLY with a JSON object — no preamble, no markdown, just raw JSON.
-
-Identify the vehicle and estimate its current market value in {country_name} ({currency}).
+    prompt = f"""You are an automotive expert. Analyse this vehicle photo and respond ONLY with raw JSON — no markdown, no preamble.
 
 Return this exact structure:
 {{
@@ -407,16 +217,12 @@ Return this exact structure:
   "market_value_low": 11000,
   "market_value_high": 14500,
   "market_value_mid": 12500,
-  "confidence": "High",
-  "reasoning": "One sentence explaining the valuation."
+  "reasoning": "One sentence on valuation basis."
 }}
 
-If you cannot identify the vehicle clearly, set confidence to "Low" and use conservative estimates.
-Base market values on current {country_name} used car prices ({currency}).
-Return ONLY the JSON object."""
-
+Base market values on current {country_name} used car prices ({sym}). Return ONLY the JSON."""
     try:
-        response = requests.post(
+        resp = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={
                 "x-api-key": ANTHROPIC_KEY,
@@ -429,24 +235,15 @@ Return ONLY the JSON object."""
                 "messages": [{
                     "role": "user",
                     "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": "image/jpeg",
-                                "data": img_b64,
-                            }
-                        },
+                        {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
                         {"type": "text", "text": prompt}
                     ]
                 }]
             },
             timeout=30
         )
-        data = response.json()
-        raw = data["content"][0]["text"].strip()
-        # Strip any accidental markdown fences
-        raw = raw.replace("```json", "").replace("```", "").strip()
+        raw = resp.json()["content"][0]["text"].strip()
+        raw = raw.replace("```json","").replace("```","").strip()
         return json.loads(raw)
     except Exception:
         return None
@@ -455,151 +252,153 @@ Return ONLY the JSON object."""
 st.markdown("""
 <div class="as-nav">
   <div style="display:flex;align-items:center;gap:14px">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <circle cx="14" cy="14" r="13" stroke="#0a0a0a" stroke-width="1.2"/>
-      <circle cx="14" cy="14" r="7" stroke="#0a0a0a" stroke-width="0.8"/>
-      <circle cx="14" cy="14" r="2.5" fill="#cc0000"/>
-      <line x1="14" y1="1" x2="14" y2="7" stroke="#0a0a0a" stroke-width="1.2"/>
-      <line x1="14" y1="21" x2="14" y2="27" stroke="#0a0a0a" stroke-width="1.2"/>
-      <line x1="1" y1="14" x2="7" y2="14" stroke="#0a0a0a" stroke-width="1.2"/>
-      <line x1="21" y1="14" x2="27" y2="14" stroke="#0a0a0a" stroke-width="1.2"/>
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <circle cx="13" cy="13" r="12" stroke="#0a0a0a" stroke-width="1.2"/>
+      <circle cx="13" cy="13" r="6.5" stroke="#0a0a0a" stroke-width="0.8"/>
+      <circle cx="13" cy="13" r="2.2" fill="#cc0000"/>
+      <line x1="13" y1="1" x2="13" y2="6.5" stroke="#0a0a0a" stroke-width="1.2"/>
+      <line x1="13" y1="19.5" x2="13" y2="25" stroke="#0a0a0a" stroke-width="1.2"/>
+      <line x1="1" y1="13" x2="6.5" y2="13" stroke="#0a0a0a" stroke-width="1.2"/>
+      <line x1="19.5" y1="13" x2="25" y2="13" stroke="#0a0a0a" stroke-width="1.2"/>
     </svg>
     <div>
       <div class="as-logo-name">Autoshot</div>
-      <div class="as-logo-sub">Vehicle Damage Intelligence</div>
+      <div class="as-logo-tag">Vehicle Damage Intelligence</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center">
-    <span class="as-nav-badge">AI-Powered</span>
-    <span class="as-nav-badge-red">v12 · mAP 0.601</span>
-  </div>
+  <div style="font-size:10px;color:#ccc;letter-spacing:0.08em;font-family:'DM Sans',sans-serif">AI-Powered Assessment</div>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Two-column layout ──────────────────────────────────────────────────────────
-col_left, col_right = st.columns([1, 1.8], gap="large")
+st.markdown('<div class="as-page">', unsafe_allow_html=True)
 
-# ── LEFT: Controls ─────────────────────────────────────────────────────────────
-with col_left:
-    st.markdown('<div style="padding:4px 0">', unsafe_allow_html=True)
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 1 — Configure
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("""
+<div class="as-step">
+  <div class="as-step-num">1</div>
+  <div class="as-step-title">Configure assessment</div>
+</div>
+""", unsafe_allow_html=True)
 
-    # Market
-    st.markdown('<div class="as-lbl">Market</div>', unsafe_allow_html=True)
+col1, col2, col3 = st.columns(3, gap="medium")
+
+with col1:
+    st.markdown('<span class="as-field-label">Market</span>', unsafe_allow_html=True)
     country = st.selectbox(
-        "Country", list(CNAME.keys()),
-        format_func=lambda x: f"{CFLAG[x]}  {CNAME[x]}",
-        label_visibility="collapsed"
+        "Market", list(CNAME.keys()),
+        format_func=lambda x: CNAME[x],
+        label_visibility="collapsed", key="country"
     )
-    sym = SYM[country]
+    st.markdown(f"""
+    <div style="display:flex;align-items:center;gap:8px;margin-top:-6px">
+      <img src="{CFLAG[country]}" style="width:22px;height:15px;border-radius:2px;border:1px solid #f0f0f0;object-fit:cover"/>
+      <span style="font-size:10px;color:#bbb;font-family:'DM Sans',sans-serif;letter-spacing:0.06em">{country.upper()} · {SYM[country]}</span>
+    </div>""", unsafe_allow_html=True)
 
-    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+with col2:
+    st.markdown('<span class="as-field-label">License Plate</span>', unsafe_allow_html=True)
+    plate = st.text_input("Plate", placeholder="1234 ABC", label_visibility="collapsed", key="plate")
 
-    # License plate (optional)
-    st.markdown('<div class="as-lbl">License Plate (optional)</div>', unsafe_allow_html=True)
-    plate_input = st.text_input(
-        "Plate", placeholder="1234 ABC",
-        label_visibility="collapsed",
-        help="Enter plate for future API lookup. Currently uses AI vision identification."
-    )
-    if plate_input:
-        st.markdown(f'<div class="as-note">Plate noted: <strong>{plate_input.upper()}</strong> · AI vision will identify the vehicle from your photos.</div>', unsafe_allow_html=True)
-
-    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
-
-    # Upload
-    st.markdown('<div class="as-lbl">Vehicle Photos</div>', unsafe_allow_html=True)
-    uploads = st.file_uploader(
-        "Photos", type=["jpg","jpeg","png","webp"],
-        accept_multiple_files=True,
-        label_visibility="collapsed"
+with col3:
+    st.markdown('<span class="as-field-label">Dealer Margin</span>', unsafe_allow_html=True)
+    margin = st.selectbox(
+        "Margin", [10, 12, 15, 18, 20, 25], index=2,
+        format_func=lambda x: f"{x}%",
+        label_visibility="collapsed", key="margin"
     )
 
-    st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
+sym = SYM[country]
 
-    # Confidence
-    st.markdown('<div class="as-lbl">Detection Threshold</div>', unsafe_allow_html=True)
-    conf = st.slider("Confidence", 0.10, 0.90, CONF_DEFAULT, 0.05, label_visibility="collapsed")
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 2 — Upload photos
+# ══════════════════════════════════════════════════════════════════════════════
+st.markdown("""
+<div class="as-step">
+  <div class="as-step-num">2</div>
+  <div class="as-step-title">Upload vehicle photos</div>
+</div>
+""", unsafe_allow_html=True)
 
-    st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
+SLOTS = [
+    ("Front",      SVG_FRONT, "Full front view · straight on"),
+    ("Rear",       SVG_REAR,  "Full rear view · straight on"),
+    ("Side Left",  SVG_SIDE,  "Driver side · full length"),
+    ("Side Right", SVG_SIDE,  "Passenger side · full length"),
+]
 
-    # Dealer calculator
-    st.markdown('<div class="as-lbl">Dealer Offer Calculator</div>', unsafe_allow_html=True)
+photo_cols = st.columns(4, gap="small")
+uploads = {}
 
-    # Show AI-suggested value if available
-    if "vehicle_data" in st.session_state and st.session_state.vehicle_data:
-        vd = st.session_state.vehicle_data
-        suggested = vd.get("market_value_mid", 12000)
-        st.markdown(f'<div class="as-note" style="margin-bottom:8px">AI estimate: {sym} {vd.get("market_value_low",0):,} – {sym} {vd.get("market_value_high",0):,}</div>', unsafe_allow_html=True)
-        market_val = st.number_input(f"Market value ({sym})", min_value=0, value=suggested, step=500)
-    else:
-        market_val = st.number_input(f"Market value ({sym})", min_value=0, value=12000, step=500)
+for i, (label, svg_tpl, hint) in enumerate(SLOTS):
+    with photo_cols[i]:
+        file = st.file_uploader(
+            label, type=["jpg","jpeg","png","webp"],
+            key=f"slot_{i}", label_visibility="collapsed"
+        )
+        uploads[label] = file
+        if file:
+            st.image(Image.open(file), use_container_width=True)
+            st.markdown(f'<div style="text-align:center;margin-top:2px"><span style="font-size:9px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:#2d7d3a">✓ {label}</span></div>', unsafe_allow_html=True)
+        else:
+            active = (i == 0)
+            st.markdown(f"""
+            <div class="as-photo-slot {'as-slot-active' if active else ''}">
+              {car_svg(svg_tpl, active=active)}
+              <div class="{'as-slot-label' if active else 'as-slot-label-muted'}">{label}</div>
+              <div class="as-slot-hint">{hint}</div>
+            </div>""", unsafe_allow_html=True)
 
-    margin = st.slider("Dealer margin", 5, 30, 15, format="%d%%")
+all_uploads = [f for f in uploads.values() if f is not None]
 
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('<div style="height:8px"></div>', unsafe_allow_html=True)
+_, btn_col, _ = st.columns([2, 1, 2])
+with btn_col:
+    analyse = st.button("⊙  Analyse Vehicle", key="analyse", disabled=(len(all_uploads) == 0))
 
-# ── RIGHT: Results ─────────────────────────────────────────────────────────────
-with col_right:
-    st.markdown('<div style="padding:4px 0">', unsafe_allow_html=True)
+# ══════════════════════════════════════════════════════════════════════════════
+# STEP 3 — Results
+# ══════════════════════════════════════════════════════════════════════════════
+if analyse or st.session_state.get("show_results"):
 
-    if not uploads:
-        st.markdown("""
-        <div class="as-empty">
-          <div class="as-empty-icon">⊙</div>
-          <div class="as-empty-text">Upload vehicle photos to begin analysis</div>
-        </div>
-        """, unsafe_allow_html=True)
+    if analyse:
+        st.session_state["show_results"] = True
+        st.session_state["vehicle_data"] = None
+
+    st.markdown('<div class="as-divider"></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="as-step">
+      <div class="as-step-num">3</div>
+      <div class="as-step-title">Assessment results</div>
+    </div>""", unsafe_allow_html=True)
+
+    if not all_uploads:
+        st.warning("Please upload at least one vehicle photo.")
+        st.session_state["show_results"] = False
 
     elif model is None:
-        st.error(f"Model not found. Check AUTOSHOT_MODEL path: {MODEL_PATH}")
+        st.error("Model not found. Check AUTOSHOT_MODEL environment variable.")
 
     else:
-        # ── Step 1: Claude Vision — vehicle identification ──────────────────────
-        first_image = Image.open(uploads[0]).convert("RGB")
-
-        # Only re-run if uploads changed
-        upload_key = "_".join([f.name for f in uploads])
-        if st.session_state.get("last_upload_key") != upload_key:
-            st.session_state["last_upload_key"] = upload_key
-            st.session_state["vehicle_data"] = None
-
+        # Claude Vision
         if ANTHROPIC_KEY and st.session_state.get("vehicle_data") is None:
-            with st.spinner("Identifying vehicle with AI..."):
-                vd = identify_vehicle_with_claude(first_image, country, sym)
+            first_img = Image.open(all_uploads[0]).convert("RGB")
+            with st.spinner("Identifying vehicle..."):
+                vd = identify_vehicle(first_img, country, sym)
                 st.session_state["vehicle_data"] = vd
-        elif not ANTHROPIC_KEY:
-            st.session_state["vehicle_data"] = None
-
-        # Show vehicle ID card
         vd = st.session_state.get("vehicle_data")
-        if vd:
-            conf_color = {"High": "#f0faf2", "Medium": "#fffbeb", "Low": "#fff5f5"}
-            conf_text  = {"High": "#2d7d3a",  "Medium": "#92400e", "Low": "#cc0000"}
-            c = vd.get("confidence", "Medium")
-            st.markdown(f"""
-            <div class="as-vehicle-card">
-              <div class="as-lbl">Vehicle Identified</div>
-              <div class="as-vehicle-make">{vd.get('make','')} {vd.get('model','')}</div>
-              <div class="as-vehicle-detail">{vd.get('year_range','')} · {vd.get('trim','')} · {vd.get('fuel','')} · {vd.get('body','')}</div>
-              <div class="as-vehicle-price">{sym} {vd.get('market_value_low',0):,} – {vd.get('market_value_high',0):,}</div>
-              <div class="as-vehicle-price-lbl">Estimated market value · {CNAME[country]}</div>
-              <div style="margin-top:8px">
-                <span style="font-size:9px;background:{conf_color.get(c,'#f5f5f5')};color:{conf_text.get(c,'#888')};padding:3px 10px;border-radius:20px;letter-spacing:0.05em">
-                  {c} confidence · {vd.get('reasoning','')}
-                </span>
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
-        elif not ANTHROPIC_KEY:
-            st.markdown('<div class="as-note" style="margin-bottom:16px">Set ANTHROPIC_API_KEY environment variable to enable AI vehicle identification.</div>', unsafe_allow_html=True)
 
-        # ── Step 2: YOLO damage detection ──────────────────────────────────────
+        default_market = vd["market_value_mid"] if vd and vd.get("market_value_mid") else 12000
+
+        # YOLO inference
         all_classes, all_confs, annotated_imgs = [], [], []
-        with st.spinner("Analysing damage..."):
-            for f in uploads:
+        with st.spinner("Detecting damage..."):
+            for f in all_uploads:
+                f.seek(0)
                 img = Image.open(f).convert("RGB")
                 arr = np.array(img)
-                res = model.predict(arr, conf=conf, verbose=False)[0]
+                res = model.predict(arr, conf=0.40, verbose=False)[0]
                 if res.boxes and len(res.boxes) > 0:
                     all_classes += [
                         CLASS_NAMES[int(c)] if int(c) < len(CLASS_NAMES) else f"class_{int(c)}"
@@ -609,119 +408,119 @@ with col_right:
                 ann = res.plot(line_width=2, pil=False, img=arr.copy())
                 annotated_imgs.append((f.name, cv2.cvtColor(ann, cv2.COLOR_BGR2RGB)))
 
-        # Annotated images grid
-        img_cols = st.columns(min(len(annotated_imgs), 3))
-        for i, (name, img) in enumerate(annotated_imgs):
-            with img_cols[i % 3]:
-                st.image(img, use_container_width=True)
+        # Annotated images
+        if annotated_imgs:
+            img_cols = st.columns(min(len(annotated_imgs), 4), gap="small")
+            for i, (name, img) in enumerate(annotated_imgs):
+                with img_cols[i % 4]:
+                    st.image(img, use_container_width=True)
+            st.markdown('<div style="height:24px"></div>', unsafe_allow_html=True)
 
-        st.markdown('<div style="height:20px"></div>', unsafe_allow_html=True)
-
-        # ── Step 3: Results ─────────────────────────────────────────────────────
+        # Costs
+        costs_table = REPAIR[country]
         total_low, total_high = 0, 0
-
-        if not all_classes:
-            st.markdown('<div class="as-clean">✓ No damage detected across all photos</div>', unsafe_allow_html=True)
-
-        else:
-            counts   = Counter(all_classes)
-            avg_conf = float(np.mean(all_confs))
-            n        = len(uploads)
-
-            st.markdown(f'<div class="as-damaged">⚠ {len(all_classes)} damage instance{"s" if len(all_classes)>1 else ""} detected across {n} photo{"s" if n>1 else ""}</div>', unsafe_allow_html=True)
-
-            # Metrics
-            st.markdown(f"""
-            <div class="as-metrics">
-              <div class="as-metric">
-                <div class="as-metric-val-red">{len(all_classes)}</div>
-                <div class="as-metric-lbl">Defects</div>
-              </div>
-              <div class="as-metric">
-                <div class="as-metric-val">{len(counts)}</div>
-                <div class="as-metric-lbl">Types</div>
-              </div>
-              <div class="as-metric">
-                <div class="as-metric-val">{avg_conf:.0%}</div>
-                <div class="as-metric-lbl">Confidence</div>
-              </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            # Damage breakdown
-            st.markdown('<div class="as-lbl">Damage Breakdown & Repair Estimate</div>', unsafe_allow_html=True)
-            costs_table = REPAIR[country]
-
-            class_confs = {}
-            for cls, c in zip(all_classes, all_confs):
-                class_confs.setdefault(cls, []).append(c)
-
-            items_html = ""
-            for cls, count in sorted(counts.items(), key=lambda x: -max(class_confs[x[0]])):
-                sev, color = SEVERITY.get(cls, ('Medium','#fb923c'))
-                low, high  = costs_table.get(cls, (100,300))
-                total_low  += low  * count
+        counts = Counter(all_classes)
+        if all_classes:
+            for cls, count in counts.items():
+                low, high   = costs_table.get(cls, (100, 300))
+                total_low  += low * count
                 total_high += high * count
-                sev_bg = {"Critical":"#fff0f0","High":"#fff5f0","Medium":"#fffbeb","Low":"#fafff0"}.get(sev,"#f5f5f5")
-                items_html += f"""
-                <div class="as-damage-item">
-                  <div class="as-damage-dot" style="background:{color}"></div>
-                  <div class="as-damage-name">{cls}</div>
-                  <div class="as-damage-count">×{count}</div>
-                  <div class="as-damage-sev" style="color:{color};background:{sev_bg}">{sev}</div>
-                  <div class="as-damage-cost">{sym} {low*count:,}–{high*count:,}</div>
-                </div>"""
+
+        repair_mid = (total_low + total_high) // 2
+        market_val = default_market
+        margin_amt = int((market_val - repair_mid) * margin / 100)
+        max_offer  = max(0, market_val - repair_mid - margin_amt)
+
+        # Results grid
+        left_col, right_col = st.columns(2, gap="medium")
+
+        with left_col:
+            if vd:
+                make_model = f"{vd.get('make','')} {vd.get('model','')}"
+                detail     = f"{vd.get('year_range','')} · {vd.get('trim','')} · {vd.get('fuel','')} · {vd.get('body','')}"
+                mv_str     = f"{sym} {vd.get('market_value_low',0):,} – {sym} {vd.get('market_value_high',0):,}"
+            else:
+                make_model = "Vehicle"
+                detail     = "Set ANTHROPIC_API_KEY for AI identification"
+                mv_str     = f"{sym} {market_val:,}"
+
+            if not all_classes:
+                status_html = '<div class="as-clean">✓ No damage detected across all photos</div>'
+                repair_str  = f"{sym} 0"
+            else:
+                n = len(all_uploads)
+                status_html = f'<div class="as-damaged">⚠ {len(all_classes)} damage instance{"s" if len(all_classes)>1 else ""} detected across {n} photo{"s" if n>1 else ""}</div>'
+                repair_str  = f"{sym} {total_low:,} – {total_high:,}"
+
+            dmg_html = ""
+            if all_classes:
+                for cls, count in sorted(counts.items(), key=lambda x: -x[1]):
+                    _, color = SEVERITY.get(cls, ('Medium','#fb923c'))
+                    low, high = costs_table.get(cls, (100,300))
+                    dmg_html += f"""
+                    <div class="as-dmg-row">
+                      <div class="as-dmg-dot" style="background:{color}"></div>
+                      <div class="as-dmg-name">{cls} &times;{count}</div>
+                      <div class="as-dmg-cost">{sym} {low*count:,}–{high*count:,}</div>
+                    </div>"""
+            else:
+                dmg_html = '<div style="font-size:12px;color:#ccc;padding:10px 0">No defects found</div>'
 
             st.markdown(f"""
-            {items_html}
-            <div class="as-total">
-              <span class="as-total-label">Total Repair Estimate</span>
-              <span class="as-total-val">{sym} {total_low:,}–{total_high:,}</span>
-            </div>
-            <div class="as-note">Indicative prices for {CFLAG[country]} {CNAME[country]}. Labour rates vary by region.</div>
-            """, unsafe_allow_html=True)
+            {status_html}
+            <div class="as-vehicle-card">
+              <div class="as-vc-make">{make_model}</div>
+              <div class="as-vc-detail">{detail}</div>
+              <div class="as-vc-div"></div>
+              <div class="as-vc-row">
+                <span class="as-vc-lbl">Market Value</span>
+                <span class="as-vc-val">{mv_str}</span>
+              </div>
+              <div class="as-vc-row">
+                <span class="as-vc-lbl">Repair Estimate</span>
+                <span class="as-vc-val-red">{repair_str}</span>
+              </div>
+              <div class="as-vc-div"></div>
+              {dmg_html}
+              <div class="as-note">{CNAME[country]} labour rates · Indicative estimates</div>
+            </div>""", unsafe_allow_html=True)
 
-        # ── Step 4: Offer calculator ────────────────────────────────────────────
-        st.markdown('<div style="height:4px"></div>', unsafe_allow_html=True)
-        repair_mid = (total_low + total_high) // 2
-        margin_amt = (market_val - repair_mid) * margin / 100
-        max_offer  = max(0, market_val - repair_mid - int(margin_amt))
+        with right_col:
+            st.markdown(f"""
+            <div class="as-offer-card">
+              <div>
+                <div class="as-oc-label">Maximum Purchase Offer</div>
+                <div class="as-oc-offer">{sym} {int(max_offer):,}</div>
+                <div class="as-oc-sub">Recommended dealer bid · {CNAME[country]}</div>
+              </div>
+              <div>
+                <div class="as-oc-div"></div>
+                <div class="as-oc-row">
+                  <span class="as-oc-rlbl">Market value</span>
+                  <span class="as-oc-rval">{sym} {market_val:,}</span>
+                </div>
+                <div class="as-oc-row">
+                  <span class="as-oc-rlbl">Repair estimate</span>
+                  <span class="as-oc-rval-red">− {sym} {repair_mid:,}</span>
+                </div>
+                <div class="as-oc-row">
+                  <span class="as-oc-rlbl">Dealer margin {margin}%</span>
+                  <span class="as-oc-rval-red">− {sym} {margin_amt:,}</span>
+                </div>
+                <div style="height:1px;background:#1a1a1a;margin:14px 0"></div>
+                <div style="font-size:9px;color:#333;letter-spacing:0.1em;line-height:1.7;font-family:'DM Sans',sans-serif">
+                  Autoshot · Vehicle Damage Intelligence<br>
+                  Model v12 · mAP 0.601 · 7 damage classes
+                </div>
+              </div>
+            </div>""", unsafe_allow_html=True)
 
-        # Show AI-sourced value note
-        ai_note = ""
-        if vd and vd.get("market_value_mid"):
-            ai_note = f'<div style="font-size:9px;color:#888;margin-bottom:6px;letter-spacing:0.05em">Market value pre-filled from AI vehicle identification</div>'
-
-        st.markdown(f"""
-        {ai_note}
-        <div class="as-offer">
-          <div class="as-offer-row">
-            <span class="as-offer-lbl">Market Value</span>
-            <span class="as-offer-val">{sym} {market_val:,}</span>
-          </div>
-          <div class="as-offer-row">
-            <span class="as-offer-lbl">Repair Estimate (mid)</span>
-            <span class="as-offer-val-red">− {sym} {repair_mid:,}</span>
-          </div>
-          <div class="as-offer-row">
-            <span class="as-offer-lbl">Dealer Margin {margin}%</span>
-            <span class="as-offer-val-red">− {sym} {int(margin_amt):,}</span>
-          </div>
-          <div class="as-offer-divider"></div>
-          <div class="as-offer-row" style="margin-top:4px">
-            <span class="as-offer-total-lbl">Max Purchase Offer</span>
-            <span class="as-offer-total-val">{sym} {int(max_offer):,}</span>
-          </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # ── Footer ─────────────────────────────────────────────────────────────────────
-model_name = os.path.basename(os.path.dirname(os.path.dirname(model_path))) if model_path else "No model loaded"
+model_name = os.path.basename(os.path.dirname(os.path.dirname(model_path))) if model_path else "No model"
 st.markdown(f"""
 <div class="as-footer">
   <span>Autoshot · Vehicle Damage Intelligence</span>
   <span>{model_name} · 7 damage classes</span>
-</div>
-""", unsafe_allow_html=True)
+</div>""", unsafe_allow_html=True)
