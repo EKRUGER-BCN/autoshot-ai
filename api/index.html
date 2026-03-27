@@ -1131,7 +1131,7 @@ function renderResults(vehicle, data, aiData, elapsed) {
       ${offerHtml}
     </div>
     <div class="action-btns">
-      <button class="analyse-btn btn-outline" onclick="printReport()">⎙ ${t('print_report')}</button>
+      <button class="analyse-btn btn-outline" onclick="generateReport()">↓ PDF Report</button>
       <button class="analyse-btn btn-outline" onclick="resetAssessment()">↺ ${t('new_assessment')}</button>
     </div>
     <div id="signer-input-wrap" style="display:flex;align-items:center;justify-content:center;margin-top:14px">
@@ -1142,21 +1142,137 @@ function renderResults(vehicle, data, aiData, elapsed) {
       <div id="sig-name-display" style="font-size:17px;font-weight:400;letter-spacing:-.3px;color:#0a0a0a"></div>
       <div id="sig-meta-display" style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;margin-top:3px"></div>
     </div>`;
+
+  // Save data for PDF generation
+  state.report = { vehicle, data, aiData, sym, cname, makeLine, detailLine, mvStr, repairStr,
+    maxOffer, marketVal, combinedMid, marginPct, marginAmt, yoloRepairMid, aiRepairMid, r, elapsed };
 }
 
-// ── Print with optional signature ─────────────────────────────────────────────
-function printReport() {
-  const name = (document.getElementById('signer-name')||{value:''}).value.trim();
-  const sig = document.getElementById('signature-block');
-  if(name) {
-    document.getElementById('sig-name-display').textContent = name;
-    const now = new Date().toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});
-    document.getElementById('sig-meta-display').textContent = now + ' · Autoshot Vehicle Assessment';
-    sig.style.display = 'block';
-  } else {
-    sig.style.display = 'none';
+// ── PDF Report ────────────────────────────────────────────────────────────────
+function generateReport() {
+  const d = state.report;
+  if(!d) return;
+
+  const signer = (document.getElementById('signer-name')||{value:''}).value.trim();
+  const now    = new Date().toLocaleString(undefined,{dateStyle:'long',timeStyle:'short'});
+  const today  = new Date().toISOString().slice(0,10);
+
+  // Extract annotated photo data-URIs from the DOM
+  const imgSrcs = [...document.querySelectorAll('.ann-img')].map(i=>i.src);
+  const photosHtml = imgSrcs.map(src=>
+    `<img src="${src}" style="width:calc(50% - 4px);border-radius:6px;border:1px solid #e8e8e8;object-fit:cover;max-height:130px">`
+  ).join('');
+
+  // Damage table rows — YOLO structural
+  let dmgRows = '';
+  if(d.r.breakdown.length) {
+    d.r.breakdown.forEach(item=>{
+      dmgRows += `<tr><td>${tc(item.class)}</td><td style="color:#aaa;font-size:10px">Structural</td><td>${d.sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</td></tr>`;
+    });
   }
-  window.print();
+  // Claude AI cosmetic
+  if(d.aiData && d.aiData.damage_found) {
+    d.aiData.damage_items.forEach(item=>{
+      const sev = item.severity==='severe'?'Severe':item.severity==='moderate'?'Moderate':'Minor';
+      dmgRows += `<tr><td>${tc(item.type)} <span style="color:#bbb;font-size:10px">· ${item.location}</span></td><td style="color:#aaa;font-size:10px">${sev}</td><td>${d.sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</td></tr>`;
+    });
+  }
+  if(!dmgRows) dmgRows = `<tr><td colspan="3" style="color:#bbb;padding:10px 0">No damage detected</td></tr>`;
+
+  const sigHtml = signer ? `
+    <div style="margin-top:22px;border-top:1px solid #e8e8e8;padding-top:14px">
+      <div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#bbb;margin-bottom:4px">Digitally signed by</div>
+      <div style="font-size:16px;font-weight:400;color:#0a0a0a;letter-spacing:-.2px">${signer}</div>
+      <div style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;margin-top:3px">${now} · Autoshot Vehicle Assessment</div>
+    </div>` : '';
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Autoshot · ${d.makeLine} · ${today}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;color:#0a0a0a;background:#fff;padding:28px 32px;font-size:12px}
+@page{size:A4 portrait;margin:10mm}
+@media print{.no-print{display:none!important}body{padding:0}}
+.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #f0f0f0;padding-bottom:14px;margin-bottom:18px}
+.logo-name{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+.logo-tag{font-size:8px;letter-spacing:.2em;color:#bbb;text-transform:uppercase;margin-top:2px}
+.report-meta{text-align:right;font-size:9px;color:#bbb;line-height:1.8;font-family:'DM Mono',monospace}
+.photos{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:0}
+.card{border:1px solid #f0f0f0;border-radius:10px;padding:14px 16px}
+.card-dark{background:#0a0a0a;border-radius:10px;padding:14px 16px;color:#fff}
+.make{font-size:17px;font-weight:300;letter-spacing:-.3px;margin-bottom:2px}
+.detail{font-size:10px;color:#aaa;margin-bottom:10px}
+.row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f8f8f8;font-size:11px}
+.lbl{color:#aaa;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.val{font-family:'DM Mono',monospace}
+.val-r{font-family:'DM Mono',monospace;color:#cc0000}
+table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px}
+th{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#bbb;padding-bottom:6px;border-bottom:1px solid #f0f0f0;text-align:left}
+td{padding:6px 0;border-bottom:1px solid #f8f8f8;vertical-align:top}
+td:last-child{font-family:'DM Mono',monospace;text-align:right;white-space:nowrap}
+.oc-lbl{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#888}
+.oc-amt{font-size:30px;font-weight:300;color:#fff;letter-spacing:-1px;margin:6px 0 3px}
+.oc-sub{font-size:10px;color:#888}
+.oc-div{height:1px;background:#1a1a1a;margin:10px 0}
+.oc-row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:10px}
+.oc-rl{color:#999}.oc-rv{font-family:'DM Mono',monospace;color:#bbb}
+.oc-rr{font-family:'DM Mono',monospace;color:#f87171}
+.oc-ft{font-size:8px;color:#555;letter-spacing:.06em;line-height:1.7;margin-top:10px}
+.print-btn{background:#0a0a0a;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:12px;font-family:'DM Sans',sans-serif;letter-spacing:.04em;cursor:pointer;margin-bottom:20px}
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">↓ Save as PDF</button>
+
+<div class="header">
+  <div>
+    <div class="logo-name">Autoshot</div>
+    <div class="logo-tag">See It. Price It.</div>
+  </div>
+  <div class="report-meta">
+    Vehicle Assessment Report<br>${now}<br>${d.cname}${state.plate?' · '+state.plate:''}
+  </div>
+</div>
+
+<div class="photos">${photosHtml}</div>
+
+<div class="two-col">
+  <div class="card">
+    <div class="make">${d.makeLine}</div>
+    <div class="detail">${d.detailLine}</div>
+    <div class="row"><span class="lbl">Market Value</span><span class="val">${d.mvStr}</span></div>
+    <div class="row"><span class="lbl">Repair Estimate</span><span class="val-r">${d.repairStr}</span></div>
+    <table>
+      <tr><th>Damage</th><th>Type</th><th style="text-align:right">Est. Cost</th></tr>
+      ${dmgRows}
+    </table>
+  </div>
+  <div class="card-dark">
+    <div class="oc-lbl">Maximum Purchase Offer</div>
+    <div class="oc-amt">${d.maxOffer!==null?d.sym+' '+d.maxOffer.toLocaleString():'—'}</div>
+    <div class="oc-sub">Recommended dealer bid · ${d.cname}</div>
+    <div class="oc-div"></div>
+    ${d.marketVal>0?`
+    <div class="oc-row"><span class="oc-rl">Market value</span><span class="oc-rv">${d.sym} ${d.marketVal.toLocaleString()}</span></div>
+    ${d.yoloRepairMid>0?`<div class="oc-row"><span class="oc-rl">Structural repairs</span><span class="oc-rr">− ${d.sym} ${d.yoloRepairMid.toLocaleString()}</span></div>`:''}
+    ${d.aiRepairMid>0?`<div class="oc-row"><span class="oc-rl">Cosmetic repairs</span><span class="oc-rr">− ${d.sym} ${d.aiRepairMid.toLocaleString()}</span></div>`:''}
+    <div class="oc-row"><span class="oc-rl">Dealer margin ${d.marginPct}%</span><span class="oc-rr">− ${d.sym} ${d.marginAmt.toLocaleString()}</span></div>`:''}
+    <div class="oc-ft">Autoshot · See It. Price It.<br>YOLOv8 + Claude Vision · ${d.elapsed}s</div>
+  </div>
+</div>
+${sigHtml}
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if(win) setTimeout(()=>URL.revokeObjectURL(url), 60000);
 }
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
