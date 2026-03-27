@@ -642,36 +642,27 @@ function renderResults(vehicle, data, aiData, elapsed) {
   const r     = data.repair;
   const o     = data.offer;
 
-  // Merge YOLO and Claude annotated images — prefer Claude's (has text overlays) with YOLO as fallback
-  const yoloByFile = {};
-  (data.annotated_images||[]).forEach(img=>{ yoloByFile[img.filename]=img.image_b64; });
-  const aiByFile = {};
-  (aiData && aiData.annotated_images||[]).forEach(img=>{ aiByFile[img.filename]=img.image_b64; });
+  // Build Claude findings per photo for badges
+  const aiByPhoto = {};
+  if(aiData && aiData.damage_items) {
+    aiData.damage_items.forEach(item=>{
+      const k = item.photo||'';
+      if(!aiByPhoto[k]) aiByPhoto[k]=[];
+      aiByPhoto[k].push(item);
+    });
+  }
 
-  // Show both: YOLO (bounding boxes) and Claude (text overlay) side by side per photo
+  // Single row of YOLO annotated images with Claude badges underneath
   let annHtml = '';
-  const allFiles = [...new Set([...Object.keys(yoloByFile), ...Object.keys(aiByFile)])];
-  if(allFiles.length) {
-    const cols = Math.min(allFiles.length, 2);
+  if(data.annotated_images && data.annotated_images.length) {
+    const cols = Math.min(data.annotated_images.length, 2);
     annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr);margin-bottom:20px">`;
-    allFiles.forEach(fname=>{
-      const yolo = yoloByFile[fname];
-      const ai   = aiByFile[fname];
-      // If both exist, show YOLO (bboxes) — Claude overlay is on the AI card below
-      const src  = yolo || ai;
-      annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${src}" alt="${fname}"/></div>`;
+    data.annotated_images.forEach(img=>{
+      const findings = aiByPhoto[img.filename]||[];
+      const badges = findings.map(f=>`<span class="ann-badge">${tc(f.type)} · ${f.location}</span>`).join('');
+      annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>${badges?`<div class="ann-badges">${badges}</div>`:''}</div>`;
     });
     annHtml += '</div>';
-    // Claude annotated images row (text overlays)
-    if(Object.keys(aiByFile).length) {
-      annHtml += `<div style="font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#bbb;margin-bottom:8px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#cc0000" stroke-width="1"/><circle cx="5" cy="5" r="1.5" fill="#cc0000"/></svg>${t('ai_analysis')}</div>`;
-      annHtml += `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr);margin-bottom:20px">`;
-      allFiles.forEach(fname=>{
-        const ai = aiByFile[fname];
-        if(ai) annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${ai}" alt="${fname}"/></div>`;
-      });
-      annHtml += '</div>';
-    }
   }
 
   // Photo count in results
