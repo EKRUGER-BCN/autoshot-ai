@@ -296,7 +296,16 @@ async def detect(
             "image_b64": img_to_base64(annotated_bgr),
         })
 
-    counts   = Counter(d["class_name"] for d in all_detections)
+    # Deduplicate across photos: the same damage appears in multiple angles.
+    # Take the max count per class from any single photo, not the sum across all photos.
+    per_photo: dict = {}
+    for d in all_detections:
+        per_photo.setdefault(d["file"], Counter())[d["class_name"]] += 1
+    counts: Counter = Counter()
+    for photo_counts in per_photo.values():
+        for cls, cnt in photo_counts.items():
+            counts[cls] = max(counts[cls], cnt)
+
     costs    = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
     sym      = CURRENCY.get(country, "€")
 
