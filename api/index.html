@@ -403,14 +403,14 @@ input[type=file]{display:none}
 
   <!-- Nerd hero -->
   <div style="background:#0a0a0a;border-radius:16px;padding:32px 28px;margin:28px 0 24px;overflow:hidden;position:relative">
-    <div style="position:absolute;inset:0;opacity:.07;font-family:'DM Mono',monospace;font-size:9px;line-height:1.6;color:#fff;padding:12px;overflow:hidden;pointer-events:none;letter-spacing:.04em">
+    <div style="position:absolute;inset:0;opacity:.04;font-family:'DM Mono',monospace;font-size:9px;line-height:1.6;color:#fff;padding:12px;overflow:hidden;pointer-events:none;letter-spacing:.04em">
       epoch 001/150 loss=3.412 mAP=0.021 &nbsp; epoch 002/150 loss=3.108 mAP=0.034 &nbsp; epoch 010/150 loss=2.441 mAP=0.112 &nbsp; epoch 025/150 loss=1.873 mAP=0.284 &nbsp; epoch 050/150 loss=1.204 mAP=0.431 &nbsp; epoch 075/150 loss=0.891 mAP=0.521 &nbsp; epoch 100/150 loss=0.712 mAP=0.573 &nbsp; epoch 125/150 loss=0.634 mAP=0.601 &nbsp; epoch 150/150 loss=0.598 mAP=0.614 &nbsp; dent P=0.621 R=0.548 mAP50=0.582 &nbsp; scratch P=0.574 R=0.487 mAP50=0.528 &nbsp; crack P=0.703 R=0.641 mAP50=0.671 &nbsp; glass_shatter P=0.768 R=0.701 mAP50=0.734 &nbsp; lamp_broken P=0.731 R=0.665 mAP50=0.698 &nbsp; tire_flat P=0.648 R=0.581 mAP50=0.615 &nbsp; paint_damage P=0.512 R=0.431 mAP50=0.470 &nbsp; Results saved to runs/detect/autoshot_v5_final &nbsp;
     </div>
     <div style="position:relative;display:flex;align-items:flex-end;gap:20px">
       <div>
-        <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#555;margin-bottom:8px">Boring Statistics</div>
+        <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#888;margin-bottom:8px">Boring Statistics</div>
         <div style="font-size:28px;font-weight:300;color:#fff;letter-spacing:-.5px;line-height:1.1">Under the hood.<br>For the nerds.</div>
-        <div style="font-size:10px;color:#444;margin-top:10px;font-family:'DM Mono',monospace">autoshot_v5_final · YOLOv8 · 150 epochs · mAP50 61.4%</div>
+        <div style="font-size:10px;color:#888;margin-top:10px;font-family:'DM Mono',monospace">autoshot_v5_final · YOLOv8 · 150 epochs · mAP50 61.4%</div>
       </div>
       <div style="margin-left:auto;flex-shrink:0">
         <svg width="80" height="52" viewBox="0 0 80 52" fill="none">
@@ -780,7 +780,7 @@ function applyTranslations() {
   document.getElementById('lbl-results-title').textContent= t('results_title');
   document.getElementById('lbl-plate').textContent        = t('plate');
   document.getElementById('lbl-margin').textContent       = t('margin');
-  document.getElementById('footer-stats-link').textContent= t('footer_model');
+  // footer-stats-link is static "Boring Statistics" — not translated
   // Slot labels
   const keys = ['front','rear','left','right'];
   keys.forEach((k,i) => {
