@@ -101,7 +101,7 @@ input[type=file]{display:none}
 .vc-note{font-size:10px;color:#ccc;margin-top:10px;line-height:1.5}
 
 /* Offer card */
-.offer-card{background:#0a0a0a;border-radius:14px;padding:30px 32px;display:flex;flex-direction:column;justify-content:space-between;min-height:340px}
+.offer-card{background:#0a0a0a;border-radius:14px;padding:30px 32px;display:flex;flex-direction:column;gap:0}
 .oc-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#555}
 .oc-offer{font-size:52px;font-weight:300;color:#fff;letter-spacing:-2px;line-height:1;margin:14px 0 6px;font-family:'DM Sans',sans-serif}
 .oc-sub{font-size:11px;color:#555;letter-spacing:.04em}
@@ -183,19 +183,23 @@ input[type=file]{display:none}
 
     <div class="nav-sep"></div>
 
-    <!-- Margin selector -->
-    <div class="nav-pill" id="margin-pill" onclick="toggleDd('margin-dd')">
+    <!-- Plate input -->
+    <div class="nav-pill" style="cursor:default;gap:6px">
+      <span class="pill-lbl">Plate</span>
+      <input id="plate-input" type="text" placeholder="1234 ABC"
+        style="border:none;outline:none;font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;background:transparent;width:80px;text-transform:uppercase;letter-spacing:.08em"
+        oninput="state.plate=this.value.toUpperCase();this.value=this.value.toUpperCase()"/>
+    </div>
+
+    <div class="nav-sep"></div>
+
+    <!-- Margin input -->
+    <div class="nav-pill" style="cursor:default;gap:6px">
       <span class="pill-lbl">Margin</span>
-      <span class="pill-val" id="sel-margin">15%</span>
-      <span class="chev">▾</span>
-      <div class="dd" id="margin-dd" style="min-width:100px">
-        <div class="dd-item" data-val="10" onclick="selectMargin(this)">10%</div>
-        <div class="dd-item" data-val="12" onclick="selectMargin(this)">12%</div>
-        <div class="dd-item sel" data-val="15" onclick="selectMargin(this)">15%</div>
-        <div class="dd-item" data-val="18" onclick="selectMargin(this)">18%</div>
-        <div class="dd-item" data-val="20" onclick="selectMargin(this)">20%</div>
-        <div class="dd-item" data-val="25" onclick="selectMargin(this)">25%</div>
-      </div>
+      <input id="margin-input" type="number" min="1" max="50" value="15"
+        style="border:none;outline:none;font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;background:transparent;width:32px;text-align:right"
+        oninput="state.margin=Math.max(1,Math.min(50,parseInt(this.value)||15))/100"/>
+      <span style="font-size:12px;color:#0a0a0a;font-family:'DM Mono',monospace">%</span>
     </div>
   </div>
 
@@ -340,6 +344,7 @@ input[type=file]{display:none}
 const state = {
   country: 'es',
   margin: 0.15,
+  plate: '',
   files: [null, null, null, null],
   currency: {'es':'€','pt':'€','br':'R$','us':'$','mx':'MX$'},
   countryNames: {'es':'Spain','pt':'Portugal','br':'Brazil','us':'United States','mx':'México'},
@@ -369,15 +374,6 @@ function selectCountry(el) {
   document.querySelectorAll('#market-dd .dd-item').forEach(i => i.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('market-dd').classList.remove('open');
-}
-
-function selectMargin(el) {
-  event.stopPropagation();
-  state.margin = parseInt(el.dataset.val) / 100;
-  document.getElementById('sel-margin').textContent = el.dataset.val + '%';
-  document.querySelectorAll('#margin-dd .dd-item').forEach(i => i.classList.remove('sel'));
-  el.classList.add('sel');
-  document.getElementById('margin-dd').classList.remove('open');
 }
 
 document.addEventListener('click', () => {
@@ -499,13 +495,31 @@ function renderResults(vehicle, data, aiData, elapsed) {
   const r = data.repair;
   const o = data.offer;
 
-  // Annotated images
+  // Build Claude findings per photo filename
+  const aiByPhoto = {};
+  if (aiData && aiData.damage_items) {
+    aiData.damage_items.forEach(item => {
+      const key = item.photo || '';
+      if (!aiByPhoto[key]) aiByPhoto[key] = [];
+      aiByPhoto[key].push(item);
+    });
+  }
+
+  // Annotated images with Claude badges
   let annHtml = '';
   if (data.annotated_images && data.annotated_images.length) {
     const cols = Math.min(data.annotated_images.length, 4);
     annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr)">`;
     data.annotated_images.forEach(img => {
-      annHtml += `<img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>`;
+      const aiFindings = aiByPhoto[img.filename] || [];
+      const badges = aiFindings.map(f =>
+        `<span style="display:inline-block;background:rgba(204,0,0,0.85);color:#fff;font-size:8px;padding:2px 7px;border-radius:4px;margin:2px 2px 0 0;letter-spacing:.04em">${f.type.replace('_',' ')} · ${f.location}</span>`
+      ).join('');
+      annHtml += `
+        <div>
+          <img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>
+          ${badges ? `<div style="margin-top:6px;line-height:1.4">${badges}</div>` : ''}
+        </div>`;
     });
     annHtml += '</div>';
   }
@@ -606,7 +620,10 @@ function renderResults(vehicle, data, aiData, elapsed) {
     <div class="results-grid">
       <div class="vehicle-card">
 
-        <div class="vc-make">${makeLine}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div class="vc-make">${makeLine}</div>
+          ${state.plate ? `<div style="font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;border:1px solid #e8e8e8;border-radius:5px;padding:3px 10px;letter-spacing:.1em">${state.plate}</div>` : ''}
+        </div>
         <div class="vc-detail">${detailLine}</div>
         <div class="vc-div"></div>
         <div class="vc-row"><span class="vc-lbl">Market Value</span><span class="vc-val">${mvStr}</span></div>
@@ -634,7 +651,10 @@ function renderResults(vehicle, data, aiData, elapsed) {
       </div>
       ${offerHtml}
     </div>
-    <div style="display:flex;justify-content:center;margin-top:36px">
+    <div style="display:flex;justify-content:center;gap:12px;margin-top:36px">
+      <button class="analyse-btn" onclick="window.print()" style="background:#fff;color:#0a0a0a;border:1px solid #e0e0e0">
+        ⎙ &nbsp;Print Report
+      </button>
       <button class="analyse-btn" onclick="resetAssessment()" style="background:#fff;color:#0a0a0a;border:1px solid #e0e0e0">
         ↺ &nbsp;New Assessment
       </button>
