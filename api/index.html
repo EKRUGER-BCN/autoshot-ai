@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Autoshot — One Photo. Instant Offer.</title>
+<title>Autoshot — See It. Price It.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
 <style>
@@ -230,7 +230,7 @@ input[type=file]{display:none}
     </svg>
     <div>
       <div class="logo-name">Autoshot</div>
-      <div class="logo-tag">One Photo. Instant Offer.</div>
+      <div class="logo-tag">See It. Price It.</div>
     </div>
   </div>
   <div class="nav-actions">
@@ -369,8 +369,16 @@ input[type=file]{display:none}
 
 <!-- Footer -->
 <div class="footer">
-  <span>Autoshot · One Photo. Instant Offer.</span>
-  <span id="footer-stats-link" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openStats()">YOLOv8 + Claude Vision · 9 markets</span>
+  <span>Autoshot · See It. Price It.</span>
+  <span id="footer-stats-link" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;letter-spacing:.12em" onclick="openStats()">
+    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="flex-shrink:0">
+      <rect x="0" y="6" width="2" height="4" fill="#ccc"><animate attributeName="height" values="4;8;3;6;4" dur="1.8s" repeatCount="indefinite"/><animate attributeName="y" values="6;2;7;4;6" dur="1.8s" repeatCount="indefinite"/></rect>
+      <rect x="3" y="3" width="2" height="7" fill="#ccc"><animate attributeName="height" values="7;3;9;5;7" dur="2.1s" repeatCount="indefinite"/><animate attributeName="y" values="3;7;1;5;3" dur="2.1s" repeatCount="indefinite"/></rect>
+      <rect x="6" y="5" width="2" height="5" fill="#ccc"><animate attributeName="height" values="5;9;4;7;5" dur="1.6s" repeatCount="indefinite"/><animate attributeName="y" values="5;1;6;3;5" dur="1.6s" repeatCount="indefinite"/></rect>
+      <rect x="9" y="2" width="2" height="8" fill="#ccc"><animate attributeName="height" values="8;4;6;3;8" dur="2.4s" repeatCount="indefinite"/><animate attributeName="y" values="2;6;4;7;2" dur="2.4s" repeatCount="indefinite"/></rect>
+    </svg>
+    Boring Statistics
+  </span>
 </div>
 
 </div><!-- /#main-page -->
@@ -393,9 +401,28 @@ input[type=file]{display:none}
 
 <div class="page" style="max-width:820px">
 
-  <div style="margin:32px 0 28px">
-    <div style="font-size:22px;font-weight:300;letter-spacing:-.5px">Training &amp; Model Statistics</div>
-    <div style="font-size:11px;color:#bbb;margin-top:5px;font-weight:300">autoshot_v5_final · YOLOv8 · custom trained on real vehicle damage</div>
+  <!-- Nerd hero -->
+  <div style="background:#0a0a0a;border-radius:16px;padding:32px 28px;margin:28px 0 24px;overflow:hidden;position:relative">
+    <div style="position:absolute;inset:0;opacity:.07;font-family:'DM Mono',monospace;font-size:9px;line-height:1.6;color:#fff;padding:12px;overflow:hidden;pointer-events:none;letter-spacing:.04em">
+      epoch 001/150 loss=3.412 mAP=0.021 &nbsp; epoch 002/150 loss=3.108 mAP=0.034 &nbsp; epoch 010/150 loss=2.441 mAP=0.112 &nbsp; epoch 025/150 loss=1.873 mAP=0.284 &nbsp; epoch 050/150 loss=1.204 mAP=0.431 &nbsp; epoch 075/150 loss=0.891 mAP=0.521 &nbsp; epoch 100/150 loss=0.712 mAP=0.573 &nbsp; epoch 125/150 loss=0.634 mAP=0.601 &nbsp; epoch 150/150 loss=0.598 mAP=0.614 &nbsp; dent P=0.621 R=0.548 mAP50=0.582 &nbsp; scratch P=0.574 R=0.487 mAP50=0.528 &nbsp; crack P=0.703 R=0.641 mAP50=0.671 &nbsp; glass_shatter P=0.768 R=0.701 mAP50=0.734 &nbsp; lamp_broken P=0.731 R=0.665 mAP50=0.698 &nbsp; tire_flat P=0.648 R=0.581 mAP50=0.615 &nbsp; paint_damage P=0.512 R=0.431 mAP50=0.470 &nbsp; Results saved to runs/detect/autoshot_v5_final &nbsp;
+    </div>
+    <div style="position:relative;display:flex;align-items:flex-end;gap:20px">
+      <div>
+        <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#555;margin-bottom:8px">Boring Statistics</div>
+        <div style="font-size:28px;font-weight:300;color:#fff;letter-spacing:-.5px;line-height:1.1">Under the hood.<br>For the nerds.</div>
+        <div style="font-size:10px;color:#444;margin-top:10px;font-family:'DM Mono',monospace">autoshot_v5_final · YOLOv8 · 150 epochs · mAP50 61.4%</div>
+      </div>
+      <div style="margin-left:auto;flex-shrink:0">
+        <svg width="80" height="52" viewBox="0 0 80 52" fill="none">
+          <rect x="0" y="28" width="10" height="24" fill="#333" rx="2"><animate attributeName="height" values="24;38;18;30;24" dur="1.8s" repeatCount="indefinite"/><animate attributeName="y" values="28;14;34;22;28" dur="1.8s" repeatCount="indefinite"/></rect>
+          <rect x="14" y="16" width="10" height="36" fill="#444" rx="2"><animate attributeName="height" values="36;20;42;28;36" dur="2.2s" repeatCount="indefinite"/><animate attributeName="y" values="16;32;10;24;16" dur="2.2s" repeatCount="indefinite"/></rect>
+          <rect x="28" y="22" width="10" height="30" fill="#555" rx="2"><animate attributeName="height" values="30;44;22;36;30" dur="1.5s" repeatCount="indefinite"/><animate attributeName="y" values="22;8;30;16;22" dur="1.5s" repeatCount="indefinite"/></rect>
+          <rect x="42" y="8" width="10" height="44" fill="#cc0000" rx="2"><animate attributeName="height" values="44;28;48;34;44" dur="2.6s" repeatCount="indefinite"/><animate attributeName="y" values="8;24;4;18;8" dur="2.6s" repeatCount="indefinite"/></rect>
+          <rect x="56" y="18" width="10" height="34" fill="#555" rx="2"><animate attributeName="height" values="34;46;26;40;34" dur="1.9s" repeatCount="indefinite"/><animate attributeName="y" values="18;6;26;12;18" dur="1.9s" repeatCount="indefinite"/></rect>
+          <rect x="70" y="30" width="10" height="22" fill="#444" rx="2"><animate attributeName="height" values="22;36;16;28;22" dur="2.3s" repeatCount="indefinite"/><animate attributeName="y" values="30;16;36;24;30" dur="2.3s" repeatCount="indefinite"/></rect>
+        </svg>
+      </div>
+    </div>
   </div>
 
   <!-- KPI row -->
@@ -566,7 +593,7 @@ input[type=file]{display:none}
 </div><!-- /.page -->
 
 <div class="footer">
-  <span>Autoshot · One Photo. Instant Offer.</span>
+  <span>Autoshot · See It. Price It.</span>
   <span style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted;letter-spacing:.14em" onclick="closeStats()">← Back to Assessment</span>
 </div>
 
@@ -1007,13 +1034,13 @@ function renderResults(vehicle, data, aiData, elapsed) {
       ${yoloRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('structural_repairs')}</span><span class="oc-rval-red">− ${sym} ${yoloRepairMid.toLocaleString()}</span></div>`:''}
       ${aiRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('cosmetic_repairs')}</span><span class="oc-rval-red">− ${sym} ${aiRepairMid.toLocaleString()}</span></div>`:''}
       <div class="oc-row"><span class="oc-rlbl">${t('dealer_margin')} ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>
-      <div class="oc-footer">Autoshot · One Photo. Instant Offer.<br>${t('footer_model')}</div>
+      <div class="oc-footer">Autoshot · See It. Price It.<br>${t('footer_model')}</div>
     </div>`;
   } else {
     offerHtml = `<div class="offer-card">
       <div class="oc-label">${t('max_offer')}</div>
       <div class="oc-offer" style="font-size:28px;margin-top:16px">${t('damage_found')||'Damage<br>Detected'}</div>
-      <div class="oc-footer" style="margin-top:16px">Autoshot · One Photo. Instant Offer.<br>${t('footer_model')}</div>
+      <div class="oc-footer" style="margin-top:16px">Autoshot · See It. Price It.<br>${t('footer_model')}</div>
     </div>`;
   }
 
