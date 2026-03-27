@@ -134,9 +134,11 @@ async def analyze(
     costs = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
 
     all_items = []
+    all_imgs  = []  # store processed PIL images for annotation later
     for file in files:
         contents  = await file.read()
         img_fixed = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
+        all_imgs.append(img_fixed)
         buf = io.BytesIO()
         img_fixed.save(buf, format="JPEG", quality=85)
         img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
@@ -211,10 +213,7 @@ Return ONLY the JSON."""
 
     # Build annotated images with Claude findings overlaid
     annotated_images = []
-    for file, result in zip(files, all_items):
-        file.seek(0)
-        contents = await file.read()
-        img = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
+    for file, img, result in zip(files, all_imgs, all_items):
         arr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         findings = result.get("damage_items", [])
         if findings:
