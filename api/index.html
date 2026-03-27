@@ -459,34 +459,41 @@ async function analyse() {
     </div>`;
   resultsSection.scrollIntoView({behavior:'smooth', block:'start'});
 
+  const t0 = Date.now();
   try {
     // Step 1 — identify vehicle
     let vehicle = null;
     const idForm = new FormData();
     idForm.append('file', state.files[0] || files[0]);
-    idForm.append('country', state.country);
-    const idResp = await fetch(`/identify?country=${state.country}`, {method:'POST', body: (() => {const f=new FormData();f.append('file',state.files[0]||files[0]);return f})()});
+    const idResp = await fetch(`/identify?country=${state.country}`, {method:'POST', body: idForm});
     if (idResp.ok) {
       const idData = await idResp.json();
       vehicle = idData.vehicle;
     }
 
-    // Step 2 — detect damage
+    // Steps 2+3 — YOLO detection + Claude damage analysis in parallel
     const detForm = new FormData();
-    files.forEach(f => detForm.append('files', f));
-    const marketVal = vehicle ? vehicle.market_value_mid : 0;
-    const url = `/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`;
-    const detResp = await fetch(url, {method:'POST', body: detForm});
-    if (!detResp.ok) throw new Error('Detection failed');
-    const data = await detResp.json();
+    const aiForm  = new FormData();
+    files.forEach(f => { detForm.append('files', f); aiForm.append('files', f); });
 
-    renderResults(vehicle, data);
+    const marketVal = vehicle ? vehicle.market_value_mid : 0;
+    const [detResp, aiResp] = await Promise.all([
+      fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`, {method:'POST', body: detForm}),
+      fetch(`/analyze?country=${state.country}`, {method:'POST', body: aiForm}),
+    ]);
+
+    if (!detResp.ok) throw new Error('Detection failed');
+    const data     = await detResp.json();
+    const aiData   = aiResp.ok ? await aiResp.json() : null;
+    const elapsed  = ((Date.now() - t0) / 1000).toFixed(1);
+
+    renderResults(vehicle, data, aiData, elapsed);
   } catch(err) {
     resultsContent.innerHTML = `<div style="color:#cc0000;padding:20px;font-size:13px">Error: ${err.message}</div>`;
   }
 }
 
-function renderResults(vehicle, data) {
+function renderResults(vehicle, data, aiData, elapsed) {
   const sym = state.currency[state.country] || '€';
   const cname = state.countryNames[state.country] || 'Spain';
   const r = data.repair;
@@ -503,10 +510,12 @@ function renderResults(vehicle, data) {
     annHtml += '</div>';
   }
 
-  // Status
-  const statusHtml = data.total_detections === 0
-    ? `<div class="status-clean">✓ No damage detected across all photos</div>`
-    : `<div class="status-damaged">⚠ ${data.total_detections} damage instance${data.total_detections>1?'s':''} detected across ${state.files.filter(f=>f).length} photo${state.files.filter(f=>f).length>1?'s':''}</div>`;
+  // Status — combine YOLO + Claude counts
+  const aiItemCount  = aiData && aiData.damage_found ? aiData.damage_items.length : 0;
+  const totalDamage  = data.total_detections + aiItemCount;
+  const statusHtml = totalDamage === 0
+    ? `<div class="status-clean">✓ No structural damage detected — cosmetic damage may require manual inspection</div>`
+    : `<div class="status-damaged">⚠ ${totalDamage} damage instance${totalDamage>1?'s':''} detected · Assessment completed in ${elapsed}s</div>`;
 
   // Vehicle info
   const makeLine   = vehicle ? `${vehicle.make} ${vehicle.model}` : 'Vehicle';
@@ -547,23 +556,33 @@ function renderResults(vehicle, data) {
 
   const repairStr = r.total_low > 0 ? `${sym} ${r.total_low.toLocaleString()} – ${sym} ${r.total_high.toLocaleString()}` : `${sym} 0`;
 
+  // Merge repair costs: YOLO + Claude
+  const aiRepairMid = aiData && aiData.damage_found ? Math.round((aiData.repair_low + aiData.repair_high) / 2) : 0;
+  const yoloRepairMid = o ? Math.round(o.repair_mid) : 0;
+  const combinedRepairMid = yoloRepairMid + aiRepairMid;
+  const marketValue = o ? Math.round(o.market_value) : 0;
+  const marginPct = o ? Math.round(o.margin_pct) : 15;
+  const marginAmt = marketValue > 0 ? Math.round((marketValue - combinedRepairMid) * marginPct / 100) : 0;
+  const maxOffer  = marketValue > 0 ? Math.max(0, marketValue - combinedRepairMid - marginAmt) : null;
+
   // Offer
   let offerHtml = '';
-  if (o) {
+  if (maxOffer !== null) {
     offerHtml = `
       <div class="offer-card">
         <div>
           <div class="oc-label">Maximum Purchase Offer</div>
-          <div class="oc-offer">${sym} ${Math.round(o.max_offer).toLocaleString()}</div>
+          <div class="oc-offer">${sym} ${maxOffer.toLocaleString()}</div>
           <div class="oc-sub">Recommended dealer bid · ${cname}</div>
         </div>
         <div>
           <div class="oc-div"></div>
-          <div class="oc-row"><span class="oc-rlbl">Market value</span><span class="oc-rval">${sym} ${Math.round(o.market_value).toLocaleString()}</span></div>
-          <div class="oc-row"><span class="oc-rlbl">Repair estimate</span><span class="oc-rval-red">− ${sym} ${Math.round(o.repair_mid).toLocaleString()}</span></div>
-          <div class="oc-row"><span class="oc-rlbl">Dealer margin ${Math.round(o.margin_pct)}%</span><span class="oc-rval-red">− ${sym} ${Math.round(o.margin_amount).toLocaleString()}</span></div>
+          <div class="oc-row"><span class="oc-rlbl">Market value</span><span class="oc-rval">${sym} ${marketValue.toLocaleString()}</span></div>
+          ${yoloRepairMid > 0 ? `<div class="oc-row"><span class="oc-rlbl">Structural repairs (AI vision)</span><span class="oc-rval-red">− ${sym} ${yoloRepairMid.toLocaleString()}</span></div>` : ''}
+          ${aiRepairMid > 0 ? `<div class="oc-row"><span class="oc-rlbl">Cosmetic repairs (AI analysis)</span><span class="oc-rval-red">− ${sym} ${aiRepairMid.toLocaleString()}</span></div>` : ''}
+          <div class="oc-row"><span class="oc-rlbl">Dealer margin ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>
           <div class="oc-div"></div>
-          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v5 · mAP 0.614 · 7 damage classes</div>
+          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>YOLO v5 + Claude Vision · 7 damage classes</div>
         </div>
       </div>`;
   } else {
@@ -594,6 +613,22 @@ function renderResults(vehicle, data) {
         <div class="vc-row"><span class="vc-lbl">Repair Estimate</span><span class="vc-val-red">${repairStr}</span></div>
         <div class="vc-div"></div>
         ${dmgHtml}
+        ${aiData && aiData.damage_found && aiData.damage_items.length > 0 ? `
+        <div class="vc-div"></div>
+        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#bbb;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#cc0000" stroke-width="1"/><circle cx="5" cy="5" r="1.5" fill="#cc0000"/></svg>
+          AI Visual Analysis
+        </div>
+        ${aiData.damage_items.map(item => `
+          <div class="dmg-row">
+            <div class="dmg-dot" style="background:${item.severity==='severe'?'#cc0000':item.severity==='moderate'?'#fb923c':'#d4a843'}"></div>
+            <div class="dmg-name" style="flex:1">${item.type.replace('_',' ')} · <span style="color:#aaa;font-size:11px">${item.location}</span></div>
+            <div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div>
+          </div>
+          <div style="font-size:10px;color:#bbb;padding:2px 0 8px 16px;line-height:1.5">${item.description}</div>
+        `).join('')}
+        ${aiData.notes ? `<div style="font-size:11px;color:#888;font-style:italic;margin-top:6px;line-height:1.6">${aiData.notes}</div>` : ''}
+        ` : ''}
         <div class="vc-note">${cname} labour rates · Indicative estimates</div>
         ${vehicle && vehicle.reasoning ? `<div class="vc-div"></div><div style="font-size:11px;color:#888;line-height:1.6;font-style:italic">${vehicle.reasoning}</div>` : ''}
       </div>

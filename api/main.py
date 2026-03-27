@@ -116,6 +116,103 @@ Base market values on current {cname} used car prices ({sym}). Return ONLY the J
     except Exception as e:
         return JSONResponse(status_code=200, content={"error": str(e), "vehicle": None})
 
+# ── Claude Vision: analyse damage ─────────────────────────────────────────────
+@app.post("/analyze")
+async def analyze(
+    files: List[UploadFile] = File(...),
+    country: str = Query(default="es"),
+):
+    if not ANTHROPIC_KEY:
+        return JSONResponse(status_code=200, content={"error": "No ANTHROPIC_API_KEY set", "analysis": None})
+
+    cname = COUNTRY_NAME.get(country, "Spain")
+    sym   = CURRENCY.get(country, "€")
+    costs = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
+
+    all_items = []
+    for file in files:
+        contents = await file.read()
+        img_b64  = base64.b64encode(contents).decode("utf-8")
+
+        prompt = f"""You are a professional automotive damage assessor with 20 years of experience evaluating used cars for dealerships in {cname}.
+
+Carefully examine this vehicle photo and identify ALL visible damage — including subtle scratches, paint chips, scuffs, and surface damage that automated systems might miss.
+
+Respond ONLY with raw JSON — no markdown, no preamble:
+{{
+  "damage_found": true,
+  "overall_condition": "good",
+  "damage_items": [
+    {{
+      "type": "scratch|dent|crack|paint_damage|rust|glass_damage|lamp_damage|tire_damage|other",
+      "location": "e.g. rear left door",
+      "severity": "minor|moderate|severe",
+      "description": "e.g. 15cm surface scratch, paint intact"
+    }}
+  ],
+  "repair_urgency": "none|cosmetic|soon|urgent",
+  "notes": "One sentence overall assessment."
+}}
+
+If no damage is visible respond with damage_found: false and empty damage_items array.
+Return ONLY the JSON."""
+
+        try:
+            resp = requests.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"},
+                json={"model": "claude-sonnet-4-20250514", "max_tokens": 1024, "messages": [{"role": "user", "content": [
+                    {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
+                    {"type": "text", "text": prompt}
+                ]}]},
+                timeout=30
+            )
+            raw = resp.json()["content"][0]["text"].strip().replace("```json","").replace("```","").strip()
+            result = json.loads(raw)
+            for item in result.get("damage_items", []):
+                item["photo"] = file.filename
+            all_items.append(result)
+        except Exception as e:
+            all_items.append({"error": str(e), "damage_found": False, "damage_items": []})
+
+    # Merge results across all photos
+    merged_items = []
+    for r in all_items:
+        merged_items.extend(r.get("damage_items", []))
+
+    # Map Claude damage types to repair cost estimates
+    TYPE_MAP = {
+        "scratch": "scratch", "dent": "dent", "crack": "crack",
+        "paint_damage": "paint damage", "glass_damage": "glass shatter",
+        "lamp_damage": "lamp broken", "tire_damage": "tire flat",
+        "rust": "paint damage", "other": "dent",
+    }
+    SEVERITY_MULT = {"minor": 0.5, "moderate": 1.0, "severe": 1.5}
+
+    total_low, total_high = 0, 0
+    for item in merged_items:
+        mapped = TYPE_MAP.get(item.get("type","other"), "dent")
+        low, high = costs.get(mapped, (100, 300))
+        mult = SEVERITY_MULT.get(item.get("severity","moderate"), 1.0)
+        item["cost_low"]  = round(low  * mult)
+        item["cost_high"] = round(high * mult)
+        total_low  += item["cost_low"]
+        total_high += item["cost_high"]
+
+    overall_conditions = [r.get("overall_condition","fair") for r in all_items if r.get("damage_found")]
+    notes = [r.get("notes","") for r in all_items if r.get("notes")]
+
+    return {
+        "damage_found": len(merged_items) > 0,
+        "damage_items": merged_items,
+        "total_items": len(merged_items),
+        "repair_low": total_low,
+        "repair_high": total_high,
+        "currency": sym,
+        "overall_condition": overall_conditions[0] if overall_conditions else "good",
+        "notes": " | ".join(notes) if notes else None,
+    }
+
 # ── Detect damage ──────────────────────────────────────────────────────────────
 @app.post("/detect")
 async def detect(
