@@ -84,6 +84,7 @@ def health():
 async def identify(
     file: UploadFile = File(...),
     country: str = Query(default="es"),
+    lang: str = Query(default="en"),
 ):
     if not ANTHROPIC_KEY:
         return JSONResponse(status_code=200, content={"error": "No ANTHROPIC_API_KEY set", "vehicle": None})
@@ -92,6 +93,7 @@ async def identify(
     img_b64  = base64.b64encode(contents).decode("utf-8")
     sym      = CURRENCY.get(country, "€")
     cname    = COUNTRY_NAME.get(country, "Spain")
+    lang_name = LANG_NAME.get(lang, "English")
 
     prompt = f"""You are an automotive expert. Analyse this vehicle photo and respond ONLY with raw JSON — no markdown, no preamble.
 
@@ -106,7 +108,7 @@ Return this exact structure:
   "market_value_low": 11000,
   "market_value_high": 14500,
   "market_value_mid": 12500,
-  "reasoning": "One sentence on valuation."
+  "reasoning": "One sentence on valuation written in {lang_name}."
 }}
 
 Be precise on year_range — maximum 2 years span based on visible facelift/generation details.
