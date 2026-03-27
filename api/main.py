@@ -58,13 +58,20 @@ def img_to_base64(img_array: np.ndarray) -> str:
     return base64.b64encode(buffer).decode('utf-8')
 
 # ── Serve frontend ─────────────────────────────────────────────────────────────
-@app.get("/", response_class=HTMLResponse)
-async def serve_frontend():
-    html_path = os.path.join(os.path.dirname(__file__), "index.html")
-    if os.path.exists(html_path):
-        with open(html_path, "r") as f:
+def _read_html(name: str) -> HTMLResponse:
+    path = os.path.join(os.path.dirname(__file__), name)
+    if os.path.exists(path):
+        with open(path, "r") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>index.html not found</h1>", status_code=404)
+    return HTMLResponse(content=f"<h1>{name} not found</h1>", status_code=404)
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_landing():
+    return _read_html("landing.html")
+
+@app.get("/app", response_class=HTMLResponse)
+async def serve_app():
+    return _read_html("index.html")
 
 # ── Health ─────────────────────────────────────────────────────────────────────
 @app.get("/health")

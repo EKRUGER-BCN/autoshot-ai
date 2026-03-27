@@ -135,11 +135,25 @@ input[type=file]{display:none}
 /* AI section */
 .ai-section-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#bbb;margin-bottom:6px;display:flex;align-items:center;gap:5px}
 
-/* Spinner */
+/* Spinner / Progress */
 .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 0}
 .spinner{width:28px;height:28px;border:2px solid #f0f0f0;border-top:2px solid #0a0a0a;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
 .spinner-text{font-size:12px;color:#bbb;letter-spacing:.06em}
+.progress-wrap{padding:48px 0 32px}
+.progress-step{display:flex;align-items:center;gap:14px;padding:11px 0;transition:opacity .3s}
+.progress-step.done .ps-circle{background:#0a0a0a;border-color:#0a0a0a}
+.progress-step.active .ps-circle{border-color:#0a0a0a}
+.progress-step.waiting{opacity:.3}
+.ps-circle{width:22px;height:22px;border-radius:50%;border:1.5px solid #ddd;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.ps-dot{width:7px;height:7px;border-radius:50%;background:#0a0a0a;animation:pulse-dot 1s ease-in-out infinite}
+.ps-label{font-size:12px;letter-spacing:.04em;color:#0a0a0a}
+.progress-step.waiting .ps-label{color:#bbb}
+.error-wrap{padding:48px 20px;text-align:center}
+.error-icon{font-size:28px;margin-bottom:14px}
+.error-title{font-size:14px;font-weight:500;color:#0a0a0a;margin-bottom:6px}
+.error-msg{font-size:11px;color:#bbb;margin-bottom:22px;line-height:1.6;max-width:320px;margin-left:auto;margin-right:auto}
 
 /* Action buttons */
 .action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
@@ -742,7 +756,7 @@ const LANG_LABEL   = {en:'EN',es:'ES',fr:'FR',de:'DE',it:'IT',nl:'NL',pt:'PT'};
 // ── Plate formats ─────────────────────────────────────────────────────────────
 const PLATE_FMT = {
   es:'1234 ABC', pt:'AB-12-CD', fr:'AB-123-CD',
-  de:'AB CD 1234', it:'AB 123 CD', nl:'AB-123-CD', br:'ABC-1234', us:'ABC 1234', mx:'ABC-123-D',
+  de:'B AB 1234', it:'AB 123 CD', nl:'AB-12-CD', br:'ABC1D23', us:'ABC 1234', mx:'ABC-123-D',
 };
 
 // ── Country data ──────────────────────────────────────────────────────────────
@@ -887,47 +901,98 @@ function updateAnalyseBtn() {
 }
 
 // ── Analyse ───────────────────────────────────────────────────────────────────
+function showProgress(step) {
+  const steps = [
+    {label:'Identifying vehicle'},
+    {label:'Detecting damage'},
+    {label:'Calculating offer'},
+  ];
+  const content = document.getElementById('results-content');
+  content.innerHTML = `<div class="progress-wrap">${steps.map((s,i)=>{
+    const n = i+1;
+    const done = n < step, active = n === step, waiting = n > step;
+    return `<div class="progress-step ${done?'done':active?'active':'waiting'}">
+      <div class="ps-circle">${done
+        ?'<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        :active?'<div class="ps-dot"></div>':''}</div>
+      <span class="ps-label">${s.label}${active?'…':done?' ✓':''}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function showError(msg, isTimeout) {
+  const content = document.getElementById('results-content');
+  content.innerHTML = `<div class="error-wrap">
+    <div class="error-icon">${isTimeout?'⏱':'⚠'}</div>
+    <div class="error-title">${isTimeout?'Request timed out':'Something went wrong'}</div>
+    <div class="error-msg">${msg}</div>
+    <button class="analyse-btn btn-outline" onclick="analyse()" style="width:auto;padding:12px 32px;display:inline-flex">↺ Try Again</button>
+  </div>`;
+  document.getElementById('analyse-btn').disabled = false;
+}
+
 async function analyse() {
   const files = state.files.filter(f=>f!==null);
   if(!files.length) return;
 
+  document.getElementById('analyse-btn').disabled = true;
   const sec = document.getElementById('results-section');
-  const content = document.getElementById('results-content');
   sec.style.display = 'block';
-  content.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="spinner-text">${t('analyse')}...</div></div>`;
   sec.scrollIntoView({behavior:'smooth',block:'start'});
+  showProgress(1);
 
   const t0 = Date.now();
-  try {
-    // Identify vehicle
-    let vehicle = null;
-    const idForm = new FormData();
-    idForm.append('file', state.files[0]||files[0]);
-    const idResp = await fetch(`/identify?country=${state.country}`, {method:'POST',body:idForm});
-    if(idResp.ok){ const d=await idResp.json(); vehicle=d.vehicle; }
+  const controller = new AbortController();
+  const timeoutId  = setTimeout(()=>controller.abort(), 90000);
 
-    // Extract plate from photo if not entered manually
-    if(!state.plate && vehicle && vehicle.plate) {
+  try {
+    // Step 1 — Identify vehicle (non-fatal if it fails)
+    let vehicle = null;
+    try {
+      const idForm = new FormData();
+      idForm.append('file', state.files[0]||files[0]);
+      const idResp = await fetch(`/identify?country=${state.country}`,{method:'POST',body:idForm,signal:controller.signal});
+      if(idResp.ok){ const d=await idResp.json(); vehicle=d.vehicle; }
+    } catch(e){ /* continue without vehicle ID */ }
+
+    if(!state.plate && vehicle && vehicle.plate){
       state.plate = vehicle.plate;
       document.getElementById('plate-input').value = vehicle.plate;
     }
 
-    // YOLO + Claude in parallel
-    const detForm = new FormData();
-    const aiForm  = new FormData();
+    // Step 2 — YOLO + Claude in parallel
+    showProgress(2);
+    const detForm = new FormData(), aiForm = new FormData();
     files.forEach(f=>{ detForm.append('files',f); aiForm.append('files',f); });
     const marketVal = vehicle ? vehicle.market_value_mid : 0;
+
     const [detResp, aiResp] = await Promise.all([
-      fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`,{method:'POST',body:detForm}),
-      fetch(`/analyze?country=${state.country}&lang=${state.lang}`,{method:'POST',body:aiForm}),
+      fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`,{method:'POST',body:detForm,signal:controller.signal}),
+      fetch(`/analyze?country=${state.country}&lang=${state.lang}`,{method:'POST',body:aiForm,signal:controller.signal}),
     ]);
-    if(!detResp.ok) throw new Error('Detection failed');
+
+    if(!detResp.ok){
+      const body = await detResp.json().catch(()=>({}));
+      const msg = detResp.status===503
+        ? 'Detection model is not loaded on the server. Please contact support.'
+        : (body.error||`Detection failed (HTTP ${detResp.status})`);
+      throw new Error(msg);
+    }
+
+    // Step 3 — Render
+    showProgress(3);
     const data   = await detResp.json();
     const aiData = aiResp.ok ? await aiResp.json() : null;
     const elapsed = ((Date.now()-t0)/1000).toFixed(1);
+    clearTimeout(timeoutId);
     renderResults(vehicle, data, aiData, elapsed);
   } catch(err) {
-    content.innerHTML = `<div style="color:#cc0000;padding:20px;font-size:13px">Error: ${err.message}</div>`;
+    clearTimeout(timeoutId);
+    const isTimeout = err.name==='AbortError';
+    showError(
+      isTimeout ? 'The analysis took too long. Check your connection and try again.' : err.message,
+      isTimeout
+    );
   }
 }
 
