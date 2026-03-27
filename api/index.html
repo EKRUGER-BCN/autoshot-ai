@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Autoshot — Vehicle Damage Intelligence</title>
+<title>Autoshot — One Shot. Full Picture.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
 <style>
@@ -172,6 +172,26 @@ input[type=file]{display:none}
   .page{padding:40px 48px 80px}
 }
 
+/* ── Stats Modal ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;padding:28px 24px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:#bbb;line-height:1;padding:4px}
+.modal-close:hover{color:#0a0a0a}
+.modal-title{font-size:16px;font-weight:500;letter-spacing:-.2px;margin-bottom:4px}
+.modal-sub{font-size:10px;color:#bbb;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px}
+.stat-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #f5f5f5}
+.stat-row:last-child{border-bottom:none}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.stat-body{flex:1}
+.stat-lbl{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#bbb}
+.stat-val{font-size:13px;font-weight:500;font-family:'DM Mono',monospace;color:#0a0a0a;margin-top:2px}
+.stat-note{font-size:10px;color:#aaa;margin-top:1px}
+.stat-bar-wrap{height:4px;background:#f0f0f0;border-radius:2px;margin-top:6px;overflow:hidden}
+.stat-bar{height:100%;background:#0a0a0a;border-radius:2px;transition:width .6s ease}
+.stat-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.stat-tag{font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid #e8e8e8;color:#555;letter-spacing:.04em;font-family:'DM Mono',monospace}
+
 /* ── Print ── */
 @media print{
   .nav,.settings-bar,.analyse-wrap,.action-btns,.footer{display:none!important}
@@ -198,7 +218,7 @@ input[type=file]{display:none}
     </svg>
     <div>
       <div class="logo-name">Autoshot</div>
-      <div class="logo-tag">Vehicle Damage Intelligence</div>
+      <div class="logo-tag">One Shot. Full Picture.</div>
     </div>
   </div>
   <div class="nav-actions">
@@ -220,11 +240,11 @@ input[type=file]{display:none}
     </div>
     <!-- Language -->
     <div class="nav-pill" id="lang-pill" onclick="toggleDd('lang-dd')">
-      <span class="pill-val" id="sel-lang">EN</span>
+      <span class="pill-val" id="sel-lang">ES</span>
       <span class="chev">▾</span>
       <div class="dd" id="lang-dd" style="min-width:120px">
-        <div class="dd-item sel" data-lang="en" onclick="selectLang(this)">English</div>
-        <div class="dd-item" data-lang="es" onclick="selectLang(this)">Español</div>
+        <div class="dd-item" data-lang="en" onclick="selectLang(this)">English</div>
+        <div class="dd-item sel" data-lang="es" onclick="selectLang(this)">Español</div>
         <div class="dd-item" data-lang="fr" onclick="selectLang(this)">Français</div>
         <div class="dd-item" data-lang="de" onclick="selectLang(this)">Deutsch</div>
         <div class="dd-item" data-lang="nl" onclick="selectLang(this)">Nederlands</div>
@@ -336,8 +356,8 @@ input[type=file]{display:none}
 
 <!-- Footer -->
 <div class="footer">
-  <span>Autoshot · Vehicle Damage Intelligence</span>
-  <span>YOLO v5 + Claude Vision · 8 markets</span>
+  <span>Autoshot · One Shot. Full Picture.</span>
+  <span id="footer-stats-link" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted" onclick="openStats()">YOLOv8 + Claude Vision · 8 markets</span>
 </div>
 
 <script>
@@ -354,7 +374,7 @@ const T = {
     dealer_margin:'Dealer margin', no_damage:'No structural damage detected — cosmetic damage may require manual inspection',
     new_assessment:'New Assessment', print_report:'Print Report',
     plate:'Plate', margin:'Margin', ai_analysis:'AI Visual Analysis',
-    labour:'labour rates · Indicative estimates', footer_model:'YOLO v5 + Claude Vision · 8 markets',
+    labour:'labour rates · Indicative estimates', footer_model:'YOLOv8 + Claude Vision · 8 markets',
     photos:'photos', of:'of', optimal:'Optimal — 4 photos', good:'Good — analysis may vary', minimum:'Minimum — limited accuracy', add_photo:'Tap to add photo',
   },
   es: {
@@ -368,7 +388,7 @@ const T = {
     dealer_margin:'Margen del dealer', no_damage:'No se detectaron daños estructurales — puede requerirse inspección manual para daños cosméticos',
     new_assessment:'Nueva Evaluación', print_report:'Imprimir Informe',
     plate:'Matrícula', margin:'Margen', ai_analysis:'Análisis Visual IA',
-    labour:'mano de obra local · Estimaciones orientativas', footer_model:'YOLO v5 + Claude Vision · 8 mercados',
+    labour:'mano de obra local · Estimaciones orientativas', footer_model:'YOLOv8 + Claude Vision · 8 mercados',
     photos:'fotos', of:'de', optimal:'Óptimo — 4 fotos', good:'Bueno — el análisis puede variar', minimum:'Mínimo — precisión limitada', add_photo:'Toca para añadir foto',
   },
   fr: {
@@ -382,7 +402,7 @@ const T = {
     dealer_margin:'Marge concessionnaire', no_damage:'Aucun dommage structurel détecté — une inspection manuelle peut être nécessaire',
     new_assessment:'Nouvelle Évaluation', print_report:'Imprimer le Rapport',
     plate:'Plaque', margin:'Marge', ai_analysis:'Analyse Visuelle IA',
-    labour:'tarifs locaux · Estimations indicatives', footer_model:'YOLO v5 + Claude Vision · 8 marchés',
+    labour:'tarifs locaux · Estimations indicatives', footer_model:'YOLOv8 + Claude Vision · 8 marchés',
     photos:'photos', of:'sur', optimal:'Optimal — 4 photos', good:'Bon — l\'analyse peut varier', minimum:'Minimum — précision limitée', add_photo:'Appuyer pour ajouter',
   },
   de: {
@@ -396,7 +416,7 @@ const T = {
     dealer_margin:'Händlermarge', no_damage:'Keine Strukturschäden erkannt — kosmetische Schäden erfordern möglicherweise manuelle Inspektion',
     new_assessment:'Neue Bewertung', print_report:'Bericht drucken',
     plate:'Kennzeichen', margin:'Marge', ai_analysis:'KI-Sichtanalyse',
-    labour:'lokale Arbeitstarife · Richtpreise', footer_model:'YOLO v5 + Claude Vision · 8 Märkte',
+    labour:'lokale Arbeitstarife · Richtpreise', footer_model:'YOLOv8 + Claude Vision · 8 Märkte',
     photos:'Fotos', of:'von', optimal:'Optimal — 4 Fotos', good:'Gut — Analyse kann variieren', minimum:'Minimal — eingeschränkte Genauigkeit', add_photo:'Tippen zum Hinzufügen',
   },
   nl: {
@@ -410,7 +430,7 @@ const T = {
     dealer_margin:'Dealermarge', no_damage:'Geen structurele schade gedetecteerd — cosmetische schade vereist mogelijk handmatige inspectie',
     new_assessment:'Nieuwe Beoordeling', print_report:'Rapport afdrukken',
     plate:'Kenteken', margin:'Marge', ai_analysis:'AI Visuele Analyse',
-    labour:'lokale tarieven · Indicatieve schattingen', footer_model:'YOLO v5 + Claude Vision · 8 markten',
+    labour:'lokale tarieven · Indicatieve schattingen', footer_model:'YOLOv8 + Claude Vision · 8 markten',
     photos:'foto\'s', of:'van', optimal:'Optimaal — 4 foto\'s', good:'Goed — analyse kan variëren', minimum:'Minimaal — beperkte nauwkeurigheid', add_photo:'Tik om toe te voegen',
   },
   pt: {
@@ -424,7 +444,7 @@ const T = {
     dealer_margin:'Margem do dealer', no_damage:'Nenhum dano estrutural detectado — danos cosméticos podem requerer inspeção manual',
     new_assessment:'Nova Avaliação', print_report:'Imprimir Relatório',
     plate:'Matrícula', margin:'Margem', ai_analysis:'Análise Visual IA',
-    labour:'taxas locais · Estimativas indicativas', footer_model:'YOLO v5 + Claude Vision · 8 mercados',
+    labour:'taxas locais · Estimativas indicativas', footer_model:'YOLOv8 + Claude Vision · 8 mercados',
     photos:'fotos', of:'de', optimal:'Ideal — 4 fotos', good:'Bom — análise pode variar', minimum:'Mínimo — precisão limitada', add_photo:'Toque para adicionar',
   },
 };
@@ -461,7 +481,7 @@ const SEV_CLASS = {'critical':'sev-critical','high':'sev-high','medium':'sev-med
 
 // ── State ─────────────────────────────────────────────────────────────────────
 const state = {
-  country:'es', lang:'en', margin:0.15, plate:'',
+  country:'es', lang:'es', margin:0.15, plate:'',
   files:[null,null,null,null],
 };
 
@@ -485,6 +505,7 @@ function applyTranslations() {
   document.getElementById('lbl-results-title').textContent= t('results_title');
   document.getElementById('lbl-plate').textContent        = t('plate');
   document.getElementById('lbl-margin').textContent       = t('margin');
+  document.getElementById('footer-stats-link').textContent= t('footer_model');
   // Slot labels
   const keys = ['front','rear','left','right'];
   keys.forEach((k,i) => {
@@ -623,7 +644,7 @@ async function analyse() {
     const marketVal = vehicle ? vehicle.market_value_mid : 0;
     const [detResp, aiResp] = await Promise.all([
       fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`,{method:'POST',body:detForm}),
-      fetch(`/analyze?country=${state.country}`,{method:'POST',body:aiForm}),
+      fetch(`/analyze?country=${state.country}&lang=${state.lang}`,{method:'POST',body:aiForm}),
     ]);
     if(!detResp.ok) throw new Error('Detection failed');
     const data   = await detResp.json();
@@ -738,13 +759,13 @@ function renderResults(vehicle, data, aiData, elapsed) {
       ${yoloRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('structural_repairs')}</span><span class="oc-rval-red">− ${sym} ${yoloRepairMid.toLocaleString()}</span></div>`:''}
       ${aiRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('cosmetic_repairs')}</span><span class="oc-rval-red">− ${sym} ${aiRepairMid.toLocaleString()}</span></div>`:''}
       <div class="oc-row"><span class="oc-rlbl">${t('dealer_margin')} ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>
-      <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>${t('footer_model')}</div>
+      <div class="oc-footer">Autoshot · One Shot. Full Picture.<br>${t('footer_model')}</div>
     </div>`;
   } else {
     offerHtml = `<div class="offer-card">
       <div class="oc-label">${t('max_offer')}</div>
       <div class="oc-offer" style="font-size:28px;margin-top:16px">${t('damage_found')||'Damage<br>Detected'}</div>
-      <div class="oc-footer" style="margin-top:16px">Autoshot · Vehicle Damage Intelligence<br>${t('footer_model')}</div>
+      <div class="oc-footer" style="margin-top:16px">Autoshot · One Shot. Full Picture.<br>${t('footer_model')}</div>
     </div>`;
   }
 
@@ -793,6 +814,110 @@ function resetAssessment() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 updateCounter();
+applyTranslations();
+</script>
+
+<!-- ── Boring Stats Modal ── -->
+<div class="modal-backdrop" id="stats-modal" onclick="closeStatsOutside(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeStats()">✕</button>
+    <div class="modal-title">Boring Statistics</div>
+    <div class="modal-sub">Under the hood · For the nerds</div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#f0f0f0">🤖</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Detection Model</div>
+        <div class="stat-val">YOLOv8 · Ultralytics ≥ 8.4</div>
+        <div class="stat-note">autoshot_v5_final · custom trained</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#fff5f5">🎯</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Model Accuracy (mAP50)</div>
+        <div class="stat-val">61.4%</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:61.4%"></div></div>
+        <div class="stat-note">Mean Average Precision across all 7 damage classes</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#f0f5ff">🔬</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Confidence Threshold</div>
+        <div class="stat-val">25%</div>
+        <div class="stat-bar-wrap"><div class="stat-bar" style="width:25%;background:#fb923c"></div></div>
+        <div class="stat-note">Detections below this score are discarded</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#f5fff5">🏷</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Damage Classes · 7 total</div>
+        <div class="stat-tags">
+          <span class="stat-tag">dent</span>
+          <span class="stat-tag">scratch</span>
+          <span class="stat-tag">crack</span>
+          <span class="stat-tag">glass shatter</span>
+          <span class="stat-tag">lamp broken</span>
+          <span class="stat-tag">tire flat</span>
+          <span class="stat-tag">paint damage</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#fdf5ff">✨</div>
+      <div class="stat-body">
+        <div class="stat-lbl">AI Vision Engine</div>
+        <div class="stat-val">Claude Sonnet (claude-sonnet-4)</div>
+        <div class="stat-note">Vehicle ID + deep damage analysis on every assessment</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#fffdf0">🌍</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Markets Supported · 8 countries</div>
+        <div class="stat-tags">
+          <span class="stat-tag">🇪🇸 ES</span>
+          <span class="stat-tag">🇵🇹 PT</span>
+          <span class="stat-tag">🇫🇷 FR</span>
+          <span class="stat-tag">🇩🇪 DE</span>
+          <span class="stat-tag">🇳🇱 NL</span>
+          <span class="stat-tag">🇧🇷 BR</span>
+          <span class="stat-tag">🇺🇸 US</span>
+          <span class="stat-tag">🇲🇽 MX</span>
+        </div>
+        <div class="stat-note">Localised repair costs + plate formats + language</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-icon" style="background:#f0f0f0">🗣</div>
+      <div class="stat-body">
+        <div class="stat-lbl">Languages</div>
+        <div class="stat-tags">
+          <span class="stat-tag">English</span>
+          <span class="stat-tag">Español</span>
+          <span class="stat-tag">Français</span>
+          <span class="stat-tag">Deutsch</span>
+          <span class="stat-tag">Nederlands</span>
+          <span class="stat-tag">Português</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function openStats(){ document.getElementById('stats-modal').classList.add('open'); }
+function closeStats(){ document.getElementById('stats-modal').classList.remove('open'); }
+function closeStatsOutside(e){ if(e.target===document.getElementById('stats-modal')) closeStats(); }
 </script>
 </body>
 </html>

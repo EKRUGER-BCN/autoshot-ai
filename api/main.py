@@ -121,17 +121,21 @@ Base market values on current {cname} used car prices ({sym}). Return ONLY the J
         return JSONResponse(status_code=200, content={"error": str(e), "vehicle": None})
 
 # ── Claude Vision: analyse damage ─────────────────────────────────────────────
+LANG_NAME = {'en':'English','es':'Spanish','fr':'French','de':'German','nl':'Dutch','pt':'Portuguese'}
+
 @app.post("/analyze")
 async def analyze(
     files: List[UploadFile] = File(...),
     country: str = Query(default="es"),
+    lang: str = Query(default="en"),
 ):
     if not ANTHROPIC_KEY:
         return JSONResponse(status_code=200, content={"error": "No ANTHROPIC_API_KEY set", "analysis": None})
 
-    cname = COUNTRY_NAME.get(country, "Spain")
-    sym   = CURRENCY.get(country, "€")
-    costs = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
+    cname    = COUNTRY_NAME.get(country, "Spain")
+    sym      = CURRENCY.get(country, "€")
+    costs    = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
+    lang_name = LANG_NAME.get(lang, "English")
 
     all_items = []
     all_imgs  = []  # store processed PIL images for annotation later
@@ -143,7 +147,7 @@ async def analyze(
         img_fixed.save(buf, format="JPEG", quality=85)
         img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
-        prompt = f"""You are a professional automotive damage assessor with 20 years of experience evaluating used cars for dealerships in {cname}.
+        prompt = f"""You are a professional automotive damage assessor with 20 years of experience evaluating used cars for dealerships in {cname}. Respond in {lang_name}.
 
 Carefully examine this vehicle photo and identify ALL visible damage — including subtle scratches, paint chips, scuffs, and surface damage that automated systems might miss.
 
@@ -164,7 +168,7 @@ Respond ONLY with raw JSON — no markdown, no preamble:
 }}
 
 If no damage is visible respond with damage_found: false and empty damage_items array.
-Return ONLY the JSON."""
+Write all location, description, and notes text in {lang_name}. Return ONLY the JSON."""
 
         try:
             resp = requests.post(
