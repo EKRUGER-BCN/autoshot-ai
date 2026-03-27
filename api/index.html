@@ -232,7 +232,7 @@ input[type=file]{display:none}
 
 <!-- ── Nav ── -->
 <nav class="nav">
-  <div class="logo">
+  <a href="/" class="logo" style="text-decoration:none;color:inherit">
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
       <circle cx="14" cy="14" r="12.5" stroke="#0a0a0a" stroke-width="1.3"/>
       <circle cx="14" cy="14" r="7" stroke="#0a0a0a" stroke-width="0.9"/>
@@ -246,7 +246,7 @@ input[type=file]{display:none}
       <div class="logo-name">Autoshot</div>
       <div class="logo-tag">See It. Price It.</div>
     </div>
-  </div>
+  </a>
   <div class="nav-actions">
     <!-- Market -->
     <div class="nav-pill" id="market-pill" onclick="toggleDd('market-dd')">
@@ -650,6 +650,8 @@ const T = {
     plate:'Plate', margin:'Margin', ai_analysis:'AI Visual Analysis',
     labour:'labour rates · Indicative estimates', footer_model:'YOLOv8 + Claude Vision · 9 markets',
     photos:'photos', of:'of', optimal:'Optimal — 4 photos', good:'Good — analysis may vary', minimum:'Minimum — limited accuracy', add_photo:'Tap to add photo',
+    report_title:'Vehicle Assessment Report', signed_by:'Digitally signed by',
+    damage_col:'Damage', type_col:'Type', cost_col:'Est. Cost',
   },
   es: {
     upload_title:'Subir fotos del vehículo', upload_sub:'Fotografía cada lado con claridad · vehículo completo en el encuadre · buena iluminación',
@@ -664,6 +666,8 @@ const T = {
     plate:'Matrícula', margin:'Margen', ai_analysis:'Análisis Visual IA',
     labour:'mano de obra local · Estimaciones orientativas', footer_model:'YOLOv8 + Claude Vision · 9 mercados',
     photos:'fotos', of:'de', optimal:'Óptimo — 4 fotos', good:'Bueno — el análisis puede variar', minimum:'Mínimo — precisión limitada', add_photo:'Toca para añadir foto',
+    report_title:'Informe de Evaluación del Vehículo', signed_by:'Firmado digitalmente por',
+    damage_col:'Daño', type_col:'Tipo', cost_col:'Coste Est.',
   },
   fr: {
     upload_title:'Télécharger les photos du véhicule', upload_sub:'Photographiez chaque côté clairement · véhicule entier dans le cadre · bonne lumière',
@@ -678,6 +682,8 @@ const T = {
     plate:'Plaque', margin:'Marge', ai_analysis:'Analyse Visuelle IA',
     labour:'tarifs locaux · Estimations indicatives', footer_model:'YOLOv8 + Claude Vision · 9 marchés',
     photos:'photos', of:'sur', optimal:'Optimal — 4 photos', good:'Bon — l\'analyse peut varier', minimum:'Minimum — précision limitée', add_photo:'Appuyer pour ajouter',
+    report_title:'Rapport d\'Évaluation du Véhicule', signed_by:'Signé numériquement par',
+    damage_col:'Dommage', type_col:'Type', cost_col:'Coût Est.',
   },
   de: {
     upload_title:'Fahrzeugfotos hochladen', upload_sub:'Fotografieren Sie jede Seite klar · gesamtes Fahrzeug im Bild · gute Beleuchtung',
@@ -692,6 +698,8 @@ const T = {
     plate:'Kennzeichen', margin:'Marge', ai_analysis:'KI-Sichtanalyse',
     labour:'lokale Arbeitstarife · Richtpreise', footer_model:'YOLOv8 + Claude Vision · 9 Märkte',
     photos:'Fotos', of:'von', optimal:'Optimal — 4 Fotos', good:'Gut — Analyse kann variieren', minimum:'Minimal — eingeschränkte Genauigkeit', add_photo:'Tippen zum Hinzufügen',
+    report_title:'Fahrzeugbewertungsbericht', signed_by:'Digital signiert von',
+    damage_col:'Schaden', type_col:'Typ', cost_col:'Gesch. Kosten',
   },
   nl: {
     upload_title:'Voertuigfoto\'s uploaden', upload_sub:'Fotografeer elke kant duidelijk · volledig voertuig in beeld · goede belichting',
@@ -706,6 +714,8 @@ const T = {
     plate:'Kenteken', margin:'Marge', ai_analysis:'AI Visuele Analyse',
     labour:'lokale tarieven · Indicatieve schattingen', footer_model:'YOLOv8 + Claude Vision · 9 markten',
     photos:'foto\'s', of:'van', optimal:'Optimaal — 4 foto\'s', good:'Goed — analyse kan variëren', minimum:'Minimaal — beperkte nauwkeurigheid', add_photo:'Tik om toe te voegen',
+    report_title:'Voertuigbeoordelingsrapport', signed_by:'Digitaal ondertekend door',
+    damage_col:'Schade', type_col:'Type', cost_col:'Gesch. Kosten',
   },
   pt: {
     upload_title:'Carregar fotos do veículo', upload_sub:'Fotografe cada lado claramente · veículo completo no enquadramento · boa iluminação',
@@ -720,6 +730,8 @@ const T = {
     plate:'Matrícula', margin:'Margem', ai_analysis:'Análise Visual IA',
     labour:'taxas locais · Estimativas indicativas', footer_model:'YOLOv8 + Claude Vision · 9 mercados',
     photos:'fotos', of:'de', optimal:'Ideal — 4 fotos', good:'Bom — análise pode variar', minimum:'Mínimo — precisão limitada', add_photo:'Toque para adicionar',
+    report_title:'Relatório de Avaliação do Veículo', signed_by:'Assinado digitalmente por',
+    damage_col:'Dano', type_col:'Tipo', cost_col:'Custo Est.',
   },
   it: {
     upload_title:'Carica le foto del veicolo', upload_sub:'Fotografa ogni lato chiaramente · veicolo intero nell\'inquadratura · buona illuminazione',
@@ -734,6 +746,8 @@ const T = {
     plate:'Targa', margin:'Margine', ai_analysis:'Analisi Visiva IA',
     labour:'tariffe locali · Stime indicative', footer_model:'YOLOv8 + Claude Vision · 9 mercati',
     photos:'foto', of:'di', optimal:'Ottimale — 4 foto', good:'Buono — analisi può variare', minimum:'Minimo — precisione limitata', add_photo:'Tocca per aggiungere',
+    report_title:'Rapporto di Valutazione del Veicolo', signed_by:'Firmato digitalmente da',
+    damage_col:'Danno', type_col:'Tipo', cost_col:'Costo Est.',
   },
 };
 
@@ -1138,7 +1152,7 @@ function renderResults(vehicle, data, aiData, elapsed) {
       <input id="signer-name" type="text" placeholder="Inspector name · leave blank to print without signature" style="border:1px solid #e8e8e8;border-radius:8px;padding:9px 14px;font-size:12px;font-family:'DM Sans',sans-serif;color:#0a0a0a;outline:none;width:320px;background:#fff;text-align:center">
     </div>
     <div id="signature-block" style="display:none;margin-top:24px;border-top:1px solid #f0f0f0;padding-top:16px;text-align:left">
-      <div style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#bbb;margin-bottom:5px">Digitally signed by</div>
+      <div style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#bbb;margin-bottom:5px">${t('signed_by')}</div>
       <div id="sig-name-display" style="font-size:17px;font-weight:400;letter-spacing:-.3px;color:#0a0a0a"></div>
       <div id="sig-meta-display" style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;margin-top:3px"></div>
     </div>`;
@@ -1177,11 +1191,11 @@ function generateReport() {
       dmgRows += `<tr><td>${tc(item.type)} <span style="color:#bbb;font-size:10px">· ${item.location}</span></td><td style="color:#aaa;font-size:10px">${sev}</td><td>${d.sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</td></tr>`;
     });
   }
-  if(!dmgRows) dmgRows = `<tr><td colspan="3" style="color:#bbb;padding:10px 0">No damage detected</td></tr>`;
+  if(!dmgRows) dmgRows = `<tr><td colspan="3" style="color:#bbb;padding:10px 0">${t('no_damage')}</td></tr>`;
 
   const sigHtml = signer ? `
     <div style="margin-top:22px;border-top:1px solid #e8e8e8;padding-top:14px">
-      <div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#bbb;margin-bottom:4px">Digitally signed by</div>
+      <div style="font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#bbb;margin-bottom:4px">${t('signed_by')}</div>
       <div style="font-size:16px;font-weight:400;color:#0a0a0a;letter-spacing:-.2px">${signer}</div>
       <div style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;margin-top:3px">${now} · Autoshot Vehicle Assessment</div>
     </div>` : '';
@@ -1235,7 +1249,7 @@ td:last-child{font-family:'DM Mono',monospace;text-align:right;white-space:nowra
     <div class="logo-tag">See It. Price It.</div>
   </div>
   <div class="report-meta">
-    Vehicle Assessment Report<br>${now}<br>${d.cname}${state.plate?' · '+state.plate:''}
+    ${t('report_title')}<br>${now}<br>${d.cname}${state.plate?' · '+state.plate:''}
   </div>
 </div>
 
@@ -1245,23 +1259,23 @@ td:last-child{font-family:'DM Mono',monospace;text-align:right;white-space:nowra
   <div class="card">
     <div class="make">${d.makeLine}</div>
     <div class="detail">${d.detailLine}</div>
-    <div class="row"><span class="lbl">Market Value</span><span class="val">${d.mvStr}</span></div>
-    <div class="row"><span class="lbl">Repair Estimate</span><span class="val-r">${d.repairStr}</span></div>
+    <div class="row"><span class="lbl">${t('market_value')}</span><span class="val">${d.mvStr}</span></div>
+    <div class="row"><span class="lbl">${t('repair_estimate')}</span><span class="val-r">${d.repairStr}</span></div>
     <table>
-      <tr><th>Damage</th><th>Type</th><th style="text-align:right">Est. Cost</th></tr>
+      <tr><th>${t('damage_col')}</th><th>${t('type_col')}</th><th style="text-align:right">${t('cost_col')}</th></tr>
       ${dmgRows}
     </table>
   </div>
   <div class="card-dark">
-    <div class="oc-lbl">Maximum Purchase Offer</div>
+    <div class="oc-lbl">${t('max_offer')}</div>
     <div class="oc-amt">${d.maxOffer!==null?d.sym+' '+d.maxOffer.toLocaleString():'—'}</div>
-    <div class="oc-sub">Recommended dealer bid · ${d.cname}</div>
+    <div class="oc-sub">${t('dealer_bid')} · ${d.cname}</div>
     <div class="oc-div"></div>
     ${d.marketVal>0?`
-    <div class="oc-row"><span class="oc-rl">Market value</span><span class="oc-rv">${d.sym} ${d.marketVal.toLocaleString()}</span></div>
-    ${d.yoloRepairMid>0?`<div class="oc-row"><span class="oc-rl">Structural repairs</span><span class="oc-rr">− ${d.sym} ${d.yoloRepairMid.toLocaleString()}</span></div>`:''}
-    ${d.aiRepairMid>0?`<div class="oc-row"><span class="oc-rl">Cosmetic repairs</span><span class="oc-rr">− ${d.sym} ${d.aiRepairMid.toLocaleString()}</span></div>`:''}
-    <div class="oc-row"><span class="oc-rl">Dealer margin ${d.marginPct}%</span><span class="oc-rr">− ${d.sym} ${d.marginAmt.toLocaleString()}</span></div>`:''}
+    <div class="oc-row"><span class="oc-rl">${t('market_value')}</span><span class="oc-rv">${d.sym} ${d.marketVal.toLocaleString()}</span></div>
+    ${d.yoloRepairMid>0?`<div class="oc-row"><span class="oc-rl">${t('structural_repairs')}</span><span class="oc-rr">− ${d.sym} ${d.yoloRepairMid.toLocaleString()}</span></div>`:''}
+    ${d.aiRepairMid>0?`<div class="oc-row"><span class="oc-rl">${t('cosmetic_repairs')}</span><span class="oc-rr">− ${d.sym} ${d.aiRepairMid.toLocaleString()}</span></div>`:''}
+    <div class="oc-row"><span class="oc-rl">${t('dealer_margin')} ${d.marginPct}%</span><span class="oc-rr">− ${d.sym} ${d.marginAmt.toLocaleString()}</span></div>`:''}
     <div class="oc-ft">Autoshot · See It. Price It.<br>YOLOv8 + Claude Vision · ${d.elapsed}s</div>
   </div>
 </div>
