@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-from PIL import Image
+from PIL import Image, ImageOps
 from ultralytics import YOLO
 import numpy as np
 import cv2
@@ -91,7 +91,7 @@ Return this exact structure:
 {{
   "make": "e.g. Volkswagen",
   "model": "e.g. Golf",
-  "year_range": "e.g. 2018-2020",
+  "year_range": "e.g. 2019-2020",
   "trim": "e.g. 1.6 TDI",
   "fuel": "e.g. Diesel",
   "body": "e.g. Hatchback",
@@ -101,6 +101,7 @@ Return this exact structure:
   "reasoning": "One sentence on valuation."
 }}
 
+Be precise on year_range — maximum 2 years span based on visible facelift/generation details.
 Base market values on current {cname} used car prices ({sym}). Return ONLY the JSON."""
 
     try:
@@ -134,8 +135,11 @@ async def analyze(
 
     all_items = []
     for file in files:
-        contents = await file.read()
-        img_b64  = base64.b64encode(contents).decode("utf-8")
+        contents  = await file.read()
+        img_fixed = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
+        buf = io.BytesIO()
+        img_fixed.save(buf, format="JPEG", quality=85)
+        img_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
 
         prompt = f"""You are a professional automotive damage assessor with 20 years of experience evaluating used cars for dealerships in {cname}.
 
@@ -234,7 +238,7 @@ async def detect(
 
     for file in files:
         contents = await file.read()
-        img      = Image.open(io.BytesIO(contents)).convert("RGB")
+        img      = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
         img_arr  = np.array(img)
         results  = m.predict(img_arr, conf=conf, verbose=False)[0]
 

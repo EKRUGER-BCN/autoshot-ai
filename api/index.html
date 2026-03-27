@@ -429,6 +429,10 @@ const T = {
   },
 };
 
+// ── Country → language mapping ────────────────────────────────────────────────
+const COUNTRY_LANG = {es:'es',pt:'pt',fr:'fr',de:'de',nl:'nl',br:'pt',us:'en',mx:'es'};
+const LANG_LABEL   = {en:'EN',es:'ES',fr:'FR',de:'DE',nl:'NL',pt:'PT'};
+
 // ── Plate formats ─────────────────────────────────────────────────────────────
 const PLATE_FMT = {
   es:'1234 ABC', pt:'AB-12-CD', fr:'AB-123-CD',
@@ -500,6 +504,12 @@ function selectCountry(el) {
   document.getElementById('market-dd').classList.remove('open');
   // Update plate placeholder
   document.getElementById('plate-input').placeholder = PLATE_FMT[state.country] || '—';
+  // Auto-match language to country
+  const lang = COUNTRY_LANG[state.country] || 'en';
+  state.lang = lang;
+  document.getElementById('sel-lang').textContent = LANG_LABEL[lang];
+  document.querySelectorAll('#lang-dd .dd-item').forEach(i=>i.classList.toggle('sel', i.dataset.lang===lang));
+  applyTranslations();
 }
 
 document.addEventListener('click', ()=>document.querySelectorAll('.dd').forEach(d=>d.classList.remove('open')));
