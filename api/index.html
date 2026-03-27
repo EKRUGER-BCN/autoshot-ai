@@ -194,11 +194,21 @@ input[type=file]{display:none}
 
 /* ── Print ── */
 @media print{
-  .nav,.settings-bar,.analyse-wrap,.action-btns,.footer{display:none!important}
+  @page{size:A4 portrait;margin:8mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .nav,.settings-bar,.analyse-wrap,.action-btns,.footer,#signer-input-wrap{display:none!important}
   .page{padding:0}
-  .offer-card{background:#f5f5f5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .offer-card{background:#f5f5f5!important;padding:14px 16px!important;min-height:0!important}
+  .oc-offer{font-size:36px!important;margin:6px 0 3px!important}
   .oc-offer,.oc-sub,.oc-label,.oc-row,.oc-rlbl,.oc-rval,.oc-rval-red,.oc-footer{color:#0a0a0a!important}
   .oc-div{background:#ddd!important}
+  .vehicle-card{padding:14px 16px!important}
+  .vc-make{font-size:15px!important}
+  .ann-grid{gap:4px!important;margin-bottom:10px!important}
+  .ann-grid img{max-height:110px!important;object-fit:cover}
+  .results-grid{gap:10px!important}
+  .status-bar{margin:6px 0 10px!important;padding:7px 12px!important}
+  #signature-block{display:block!important}
 }
 </style>
 </head>
@@ -791,9 +801,32 @@ function renderResults(vehicle, data, aiData, elapsed) {
       ${offerHtml}
     </div>
     <div class="action-btns">
-      <button class="analyse-btn btn-outline" onclick="window.print()">⎙ ${t('print_report')}</button>
+      <button class="analyse-btn btn-outline" onclick="printReport()">⎙ ${t('print_report')}</button>
       <button class="analyse-btn btn-outline" onclick="resetAssessment()">↺ ${t('new_assessment')}</button>
+    </div>
+    <div id="signer-input-wrap" style="display:flex;align-items:center;justify-content:center;margin-top:14px">
+      <input id="signer-name" type="text" placeholder="Inspector name · leave blank to print without signature" style="border:1px solid #e8e8e8;border-radius:8px;padding:9px 14px;font-size:12px;font-family:'DM Sans',sans-serif;color:#0a0a0a;outline:none;width:320px;background:#fff;text-align:center">
+    </div>
+    <div id="signature-block" style="display:none;margin-top:24px;border-top:1px solid #f0f0f0;padding-top:16px;text-align:left">
+      <div style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#bbb;margin-bottom:5px">Digitally signed by</div>
+      <div id="sig-name-display" style="font-size:17px;font-weight:400;letter-spacing:-.3px;color:#0a0a0a"></div>
+      <div id="sig-meta-display" style="font-size:9px;color:#bbb;font-family:'DM Mono',monospace;margin-top:3px"></div>
     </div>`;
+}
+
+// ── Print with optional signature ─────────────────────────────────────────────
+function printReport() {
+  const name = (document.getElementById('signer-name')||{value:''}).value.trim();
+  const sig = document.getElementById('signature-block');
+  if(name) {
+    document.getElementById('sig-name-display').textContent = name;
+    const now = new Date().toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'});
+    document.getElementById('sig-meta-display').textContent = now + ' · Autoshot Vehicle Assessment';
+    sig.style.display = 'block';
+  } else {
+    sig.style.display = 'none';
+  }
+  window.print();
 }
 
 // ── Reset ─────────────────────────────────────────────────────────────────────
