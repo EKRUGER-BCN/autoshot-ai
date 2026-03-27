@@ -8,325 +8,326 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{font-family:'DM Sans',sans-serif;background:#fff;color:#0a0a0a;min-height:100vh}
+html,body{font-family:'DM Sans',sans-serif;background:#fff;color:#0a0a0a;min-height:100vh;-webkit-tap-highlight-color:transparent}
 
 /* ── Nav ── */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;border-bottom:1px solid #f0f0f0;background:#fff;position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center;gap:14px}
-.logo-name{font-size:13px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase}
-.logo-tag{font-size:8px;letter-spacing:0.22em;color:#bbb;text-transform:uppercase;margin-top:2px;font-weight:300}
-.nav-config{display:flex;align-items:center;gap:8px}
-.nav-sep{width:1px;height:18px;background:#ececec;margin:0 2px}
-.nav-pill{display:flex;align-items:center;gap:7px;padding:6px 11px;border:1px solid #ececec;border-radius:7px;cursor:pointer;background:#fff;position:relative;transition:border-color .15s;user-select:none}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:56px;border-bottom:1px solid #f0f0f0;background:#fff;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-name{font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase}
+.logo-tag{font-size:7px;letter-spacing:0.2em;color:#bbb;text-transform:uppercase;margin-top:1px;font-weight:300}
+.nav-actions{display:flex;align-items:center;gap:6px}
+.nav-pill{display:flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid #ececec;border-radius:7px;cursor:pointer;background:#fff;position:relative;transition:border-color .15s;user-select:none;white-space:nowrap}
 .nav-pill:hover{border-color:#bbb}
-.nav-pill .chev{font-size:8px;color:#bbb;margin-left:2px}
-.pill-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#bbb}
-.pill-val{font-size:12px;color:#0a0a0a;font-family:'DM Mono',monospace}
-.flag{width:18px;height:12px;border-radius:1px;object-fit:cover;border:1px solid #f0f0f0}
-.country-name{font-size:12px;color:#0a0a0a}
-.dd{display:none;position:absolute;top:calc(100% + 5px);left:0;background:#fff;border:1px solid #ececec;border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.07);min-width:160px}
+.pill-lbl{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#bbb}
+.pill-val{font-size:11px;color:#0a0a0a;font-family:'DM Mono',monospace}
+.flag{width:16px;height:11px;border-radius:1px;object-fit:cover;border:1px solid #f0f0f0;flex-shrink:0}
+.chev{font-size:7px;color:#bbb}
+.dd{display:none;position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #ececec;border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);min-width:160px}
 .dd.open{display:block}
-.dd-item{padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#0a0a0a;cursor:pointer;white-space:nowrap}
+.dd-item{padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#0a0a0a;cursor:pointer;white-space:nowrap}
 .dd-item:hover{background:#f8f8f8}
 .dd-item.sel{background:#fafafa;font-weight:500}
 .dd-cur{font-size:9px;color:#ccc;margin-left:auto;font-family:'DM Mono',monospace}
-.nav-right{font-size:9px;color:#ccc;letter-spacing:.14em;text-transform:uppercase}
+
+/* ── Settings bar ── */
+.settings-bar{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid #f5f5f5;background:#fafafa;flex-wrap:wrap}
+.sb-item{display:flex;align-items:center;gap:6px}
+.sb-lbl{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#bbb;white-space:nowrap}
+.sb-input{border:1px solid #e8e8e8;border-radius:6px;padding:5px 8px;font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;background:#fff;outline:none;transition:border-color .15s}
+.sb-input:focus{border-color:#0a0a0a}
+.sb-sep{width:1px;height:16px;background:#e8e8e8}
 
 /* ── Page ── */
-.page{max-width:1140px;margin:0 auto;padding:48px 48px 80px}
+.page{max-width:960px;margin:0 auto;padding:24px 20px 80px}
 
 /* ── Section header ── */
-.section-hd{margin-bottom:24px}
-.section-title{font-size:14px;font-weight:500;color:#0a0a0a}
-.section-req{font-size:9px;color:#cc0000;letter-spacing:.1em;text-transform:uppercase;margin-left:8px;font-weight:400}
-.section-sub{font-size:11px;color:#bbb;margin-top:4px;font-weight:300}
+.section-hd{margin-bottom:16px}
+.section-title{font-size:13px;font-weight:500;color:#0a0a0a;display:flex;align-items:center;gap:8px}
+.section-sub{font-size:10px;color:#bbb;margin-top:3px;font-weight:300;line-height:1.5}
+
+/* ── Photo counter ── */
+.photo-counter{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;border-radius:8px;border:1px solid #f0f0f0;background:#fafafa}
+.pc-dots{display:flex;gap:5px}
+.pc-dot{width:10px;height:10px;border-radius:50%;background:#e8e8e8;transition:background .2s}
+.pc-dot.green{background:#22c55e}
+.pc-dot.amber{background:#f59e0b}
+.pc-dot.red{background:#cc0000}
+.pc-text{font-size:10px;color:#888;letter-spacing:.04em;margin-left:4px}
+.pc-badge{font-size:9px;padding:2px 8px;border-radius:20px;margin-left:auto;font-weight:500;letter-spacing:.04em}
+.pc-badge.green{background:#f0faf2;color:#2d7d3a;border:1px solid #c3e6cb}
+.pc-badge.amber{background:#fffbeb;color:#92400e;border:1px solid #fcd34d}
+.pc-badge.red{background:#fff5f5;color:#cc0000;border:1px solid #fecaca}
+.pc-badge.grey{background:#f5f5f5;color:#bbb;border:1px solid #e8e8e8}
 
 /* ── Photo grid ── */
-.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.slot{border:1.5px dashed #e8e8e8;border-radius:12px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px 14px 16px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s;position:relative;overflow:hidden}
-.slot:hover{border-color:#999;background:#fafafa}
-.slot.active{border:1.5px solid #0a0a0a;background:#f9f9f9}
-.slot.filled{border:1.5px solid #0a0a0a;border-style:solid;padding:0}
-.slot.filled img{width:100%;height:100%;object-fit:cover;border-radius:10px}
-.slot-lbl{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#0a0a0a;text-align:center;line-height:1.6}
-.slot-lbl-m{font-size:9px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#bbb;text-align:center;line-height:1.6}
-.slot-sub{font-size:7.5px;font-weight:300;letter-spacing:.04em;color:#bbb;display:block;margin-top:1px}
-.add-btn{font-size:9px;letter-spacing:.06em;color:#777;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:color .15s}
-.add-btn:hover{color:#333}
-.add-btn-m{font-size:9px;letter-spacing:.06em;color:#ccc;background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px;transition:color .15s}
-.add-btn-m:hover{color:#777}
-.slot-overlay{position:absolute;bottom:8px;right:8px;background:rgba(10,10,10,.6);color:#fff;font-size:8px;padding:3px 8px;border-radius:4px;letter-spacing:.06em;cursor:pointer}
-.slot-overlay:hover{background:rgba(10,10,10,.85)}
+.photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.slot{border:1.5px dashed #e0e0e0;border-radius:12px;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px 12px;cursor:pointer;background:#fff;transition:border-color .2s,background .2s;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none}
+.slot:active{background:#f9f9f9}
+.slot.active{border-color:#0a0a0a;background:#f9f9f9}
+.slot.filled{border-style:solid;border-color:#0a0a0a;padding:0}
+.slot.filled img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.slot-icon{display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.5}
+.slot.active .slot-icon{opacity:1}
+.slot-dir{font-size:16px;line-height:1}
+.slot-lbl{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#0a0a0a;text-align:center}
+.slot-lbl-m{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:#bbb;text-align:center}
+.slot-hint{font-size:8px;color:#ccc;text-align:center;line-height:1.4}
+.slot-overlay{position:absolute;bottom:8px;right:8px;background:rgba(10,10,10,.65);color:#fff;font-size:9px;padding:4px 10px;border-radius:5px;cursor:pointer;letter-spacing:.04em}
 input[type=file]{display:none}
 
 /* ── Analyse button ── */
-.analyse-wrap{display:flex;justify-content:center;margin:36px 0 0}
-.analyse-btn{display:inline-flex;align-items:center;gap:10px;background:#0a0a0a;color:#fff;border:none;border-radius:10px;padding:15px 48px;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;letter-spacing:.06em;cursor:pointer;transition:background .15s}
-.analyse-btn:hover{background:#222}
+.analyse-wrap{margin:20px 0 0}
+.analyse-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#0a0a0a;color:#fff;border:none;border-radius:12px;padding:16px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;letter-spacing:.04em;cursor:pointer;transition:background .15s;-webkit-appearance:none}
+.analyse-btn:active{background:#333}
 .analyse-btn:disabled{background:#e0e0e0;color:#aaa;cursor:not-allowed}
+.btn-outline{background:#fff;color:#0a0a0a;border:1px solid #e0e0e0}
+.btn-outline:active{background:#f5f5f5}
 
 /* ── Divider ── */
-.divider{height:1px;background:#f0f0f0;margin:48px 0 0}
+.divider{height:1px;background:#f0f0f0;margin:32px 0 0}
 
 /* ── Results ── */
-.results-section{margin-top:0}
-.results-header{display:flex;align-items:center;gap:12px;margin:40px 0 28px}
-.results-step{width:26px;height:26px;border-radius:50%;border:1px solid #0a0a0a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.results-header{display:flex;align-items:center;gap:10px;margin:28px 0 20px}
+.results-step{width:24px;height:24px;border-radius:50%;border:1px solid #0a0a0a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
 .results-title{font-size:13px;font-weight:500}
 
 /* Annotated images */
-.ann-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
-.ann-img{width:100%;border-radius:10px;border:1px solid #f0f0f0;display:block}
+.ann-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+.ann-img{width:100%;border-radius:8px;border:1px solid #f0f0f0;display:block}
+.ann-badges{margin-top:4px;display:flex;flex-wrap:wrap;gap:3px}
+.ann-badge{display:inline-block;background:rgba(204,0,0,.85);color:#fff;font-size:8px;padding:2px 6px;border-radius:4px;letter-spacing:.03em}
 
 /* Status */
-.status-clean{background:#f0faf2;border:1px solid #c3e6cb;border-radius:8px;padding:12px 18px;color:#2d7d3a;font-size:12px;margin-bottom:20px}
-.status-damaged{background:#fff8f0;border:1px solid #fdd9b5;border-radius:8px;padding:12px 18px;color:#b45309;font-size:12px;margin-bottom:20px}
+.status-clean{background:#f0faf2;border:1px solid #c3e6cb;border-radius:8px;padding:12px 16px;color:#2d7d3a;font-size:12px;margin-bottom:16px;line-height:1.5}
+.status-damaged{background:#fff8f0;border:1px solid #fdd9b5;border-radius:8px;padding:12px 16px;color:#b45309;font-size:12px;margin-bottom:16px;line-height:1.5}
 
-/* Results grid */
-.results-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+/* Results grid — stacks on mobile */
+.results-grid{display:grid;grid-template-columns:1fr;gap:14px}
 
-/* Vehicle + damage card */
-.vehicle-card{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:26px 28px}
-.vc-make{font-size:22px;font-weight:300;letter-spacing:-.5px}
-.vc-detail{font-size:12px;color:#aaa;margin-top:4px;font-weight:300}
-.vc-div{height:1px;background:#f5f5f5;margin:18px 0}
-.vc-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.vc-lbl{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#ccc}
+/* Vehicle card */
+.vehicle-card{background:#fff;border:1px solid #f0f0f0;border-radius:14px;padding:22px}
+.vc-make{font-size:20px;font-weight:300;letter-spacing:-.3px}
+.vc-detail{font-size:11px;color:#aaa;margin-top:3px;font-weight:300}
+.vc-div{height:1px;background:#f5f5f5;margin:14px 0}
+.vc-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.vc-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#ccc}
 .vc-val{font-size:13px;font-weight:400;font-family:'DM Mono',monospace;color:#0a0a0a}
 .vc-val-red{font-size:13px;font-weight:400;font-family:'DM Mono',monospace;color:#cc0000}
-.dmg-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5}
+.dmg-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #f5f5f5;flex-wrap:wrap}
 .dmg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.dmg-name{font-size:12px;color:#0a0a0a;flex:1;text-transform:capitalize}
-.dmg-cost{font-size:11px;color:#999;font-family:'DM Mono',monospace}
-.vc-note{font-size:10px;color:#ccc;margin-top:10px;line-height:1.5}
+.dmg-name{font-size:12px;color:#0a0a0a;flex:1;text-transform:capitalize;min-width:80px}
+.dmg-conf{font-size:9px;color:#bbb;font-family:'DM Mono',monospace}
+.dmg-cost{font-size:10px;color:#999;font-family:'DM Mono',monospace}
+.vc-note{font-size:9px;color:#ccc;margin-top:10px;line-height:1.5}
 
 /* Offer card */
-.offer-card{background:#0a0a0a;border-radius:14px;padding:30px 32px;display:flex;flex-direction:column;gap:0}
-.oc-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#555}
-.oc-offer{font-size:52px;font-weight:300;color:#fff;letter-spacing:-2px;line-height:1;margin:14px 0 6px;font-family:'DM Sans',sans-serif}
-.oc-sub{font-size:11px;color:#555;letter-spacing:.04em}
-.oc-div{height:1px;background:#1a1a1a;margin:20px 0}
-.oc-row{display:flex;justify-content:space-between;margin-bottom:9px}
+.offer-card{background:#0a0a0a;border-radius:14px;padding:26px}
+.oc-label{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:#555}
+.oc-offer{font-size:44px;font-weight:300;color:#fff;letter-spacing:-2px;line-height:1;margin:10px 0 4px;font-family:'DM Sans',sans-serif}
+.oc-sub{font-size:10px;color:#555;letter-spacing:.03em}
+.oc-div{height:1px;background:#1a1a1a;margin:16px 0}
+.oc-row{display:flex;justify-content:space-between;margin-bottom:8px}
 .oc-rlbl{font-size:10px;color:#555}
 .oc-rval{font-size:10px;color:#777;font-family:'DM Mono',monospace}
 .oc-rval-red{font-size:10px;color:#cc4444;font-family:'DM Mono',monospace}
-.oc-footer{font-size:9px;color:#333;letter-spacing:.08em;line-height:1.7}
+.oc-footer{font-size:8px;color:#333;letter-spacing:.06em;line-height:1.7;margin-top:16px}
 
-/* Loading spinner */
+/* AI section */
+.ai-section-lbl{font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:#bbb;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+
+/* Spinner */
 .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:60px 0}
 .spinner{width:28px;height:28px;border:2px solid #f0f0f0;border-top:2px solid #0a0a0a;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner-text{font-size:12px;color:#bbb;letter-spacing:.06em}
 
-/* Footer */
-.footer{border-top:1px solid #f0f0f0;padding:14px 48px;background:#fff;font-size:9px;letter-spacing:.16em;color:#ccc;text-transform:uppercase;display:flex;justify-content:space-between;margin-top:60px}
+/* Action buttons */
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
 
-/* Severity colors */
-.sev-dot-critical{background:#cc0000}
-.sev-dot-high{background:#f87171}
-.sev-dot-medium{background:#fb923c}
-.sev-dot-low{background:#d4a843}
+/* Footer */
+.footer{border-top:1px solid #f0f0f0;padding:12px 20px;background:#fff;font-size:8px;letter-spacing:.14em;color:#ccc;text-transform:uppercase;display:flex;justify-content:space-between;margin-top:40px}
+
+/* Severity */
+.sev-critical{background:#cc0000}
+.sev-high{background:#f87171}
+.sev-medium{background:#fb923c}
+.sev-low{background:#d4a843}
+
+/* ── Tablet / Desktop ── */
+@media(min-width:640px){
+  .nav{padding:0 32px;height:60px}
+  .settings-bar{padding:8px 32px}
+  .page{padding:32px 32px 80px}
+  .photo-grid{grid-template-columns:repeat(4,1fr)}
+  .ann-grid{grid-template-columns:repeat(4,1fr)}
+  .results-grid{grid-template-columns:1fr 1fr}
+  .action-btns{grid-template-columns:auto auto;justify-content:center}
+  .analyse-btn{width:auto;padding:14px 48px}
+  .analyse-wrap{display:flex;justify-content:center}
+  .oc-offer{font-size:52px}
+}
+@media(min-width:960px){
+  .nav{padding:0 48px}
+  .settings-bar{padding:8px 48px}
+  .page{padding:40px 48px 80px}
+}
+
+/* ── Print ── */
+@media print{
+  .nav,.settings-bar,.analyse-wrap,.action-btns,.footer{display:none!important}
+  .page{padding:0}
+  .offer-card{background:#f5f5f5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .oc-offer,.oc-sub,.oc-label,.oc-row,.oc-rlbl,.oc-rval,.oc-rval-red,.oc-footer{color:#0a0a0a!important}
+  .oc-div{background:#ddd!important}
+}
 </style>
 </head>
 <body>
 
-<!-- ── Nav ───────────────────────────────────────────────────────────────── -->
+<!-- ── Nav ── -->
 <nav class="nav">
   <div class="logo">
-    <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-      <circle cx="17" cy="17" r="15.5" stroke="#0a0a0a" stroke-width="1.4"/>
-      <circle cx="17" cy="17" r="8.5" stroke="#0a0a0a" stroke-width="1"/>
-      <circle cx="17" cy="17" r="2.8" fill="#cc0000"/>
-      <line x1="17" y1="1.5" x2="17" y2="8.5" stroke="#0a0a0a" stroke-width="1.4"/>
-      <line x1="17" y1="25.5" x2="17" y2="32.5" stroke="#0a0a0a" stroke-width="1.4"/>
-      <line x1="1.5" y1="17" x2="8.5" y2="17" stroke="#0a0a0a" stroke-width="1.4"/>
-      <line x1="25.5" y1="17" x2="32.5" y2="17" stroke="#0a0a0a" stroke-width="1.4"/>
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="12.5" stroke="#0a0a0a" stroke-width="1.3"/>
+      <circle cx="14" cy="14" r="7" stroke="#0a0a0a" stroke-width="0.9"/>
+      <circle cx="14" cy="14" r="2.4" fill="#cc0000"/>
+      <line x1="14" y1="1.5" x2="14" y2="7" stroke="#0a0a0a" stroke-width="1.3"/>
+      <line x1="14" y1="21" x2="14" y2="26.5" stroke="#0a0a0a" stroke-width="1.3"/>
+      <line x1="1.5" y1="14" x2="7" y2="14" stroke="#0a0a0a" stroke-width="1.3"/>
+      <line x1="21" y1="14" x2="26.5" y2="14" stroke="#0a0a0a" stroke-width="1.3"/>
     </svg>
     <div>
       <div class="logo-name">Autoshot</div>
-      <div class="logo-tag">One shot. Clear results.</div>
+      <div class="logo-tag">Vehicle Damage Intelligence</div>
     </div>
   </div>
-
-  <div class="nav-config">
-    <!-- Gear icon decorative -->
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:#ccc">
-      <path d="M5.7 1.3L5.4 2.6Q4.8 2.8 4.3 3.2L3.0 2.7L1.9 4.6L3.0 5.6Q2.9 6.1 2.9 7Q2.9 7.9 3.0 8.4L1.9 9.4L3.0 11.3L4.3 10.8Q4.8 11.2 5.4 11.4L5.7 12.7L8.3 12.7L8.6 11.4Q9.2 11.2 9.7 10.8L11.0 11.3L12.1 9.4L11.0 8.4Q11.1 7.9 11.1 7Q11.1 6.1 11.0 5.6L12.1 4.6L11.0 2.7L9.7 3.2Q9.2 2.8 8.6 2.6L8.3 1.3Z" stroke="#ccc" stroke-width="0.9" fill="none" stroke-linejoin="round"/>
-      <circle cx="7" cy="7" r="2" stroke="#ccc" stroke-width="0.9"/>
-    </svg>
-
-    <div class="nav-sep"></div>
-
-    <!-- Market selector -->
+  <div class="nav-actions">
+    <!-- Market -->
     <div class="nav-pill" id="market-pill" onclick="toggleDd('market-dd')">
       <img class="flag" id="sel-flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg" alt=""/>
-      <span class="country-name" id="sel-country">Spain</span>
+      <span class="pill-val" id="sel-country">ES</span>
       <span class="chev">▾</span>
       <div class="dd" id="market-dd">
-        <div class="dd-item sel" data-code="es" data-name="Spain" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg" onclick="selectCountry(this)">
-          <img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg" alt=""/>Spain<span class="dd-cur">€</span>
-        </div>
-        <div class="dd-item" data-code="pt" data-name="Portugal" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg" onclick="selectCountry(this)">
-          <img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg" alt=""/>Portugal<span class="dd-cur">€</span>
-        </div>
-        <div class="dd-item" data-code="br" data-name="Brazil" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg" onclick="selectCountry(this)">
-          <img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg" alt=""/>Brazil<span class="dd-cur">R$</span>
-        </div>
-        <div class="dd-item" data-code="us" data-name="United States" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg" onclick="selectCountry(this)">
-          <img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg" alt=""/>United States<span class="dd-cur">$</span>
-        </div>
-        <div class="dd-item" data-code="mx" data-name="México" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg" onclick="selectCountry(this)">
-          <img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg" alt=""/>México<span class="dd-cur">MX$</span>
-        </div>
+        <div class="dd-item sel" data-code="es" data-name="ES" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/es.svg" alt=""/>España<span class="dd-cur">€</span></div>
+        <div class="dd-item" data-code="pt" data-name="PT" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/pt.svg" alt=""/>Portugal<span class="dd-cur">€</span></div>
+        <div class="dd-item" data-code="fr" data-name="FR" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/fr.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/fr.svg" alt=""/>France<span class="dd-cur">€</span></div>
+        <div class="dd-item" data-code="de" data-name="DE" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/de.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/de.svg" alt=""/>Deutschland<span class="dd-cur">€</span></div>
+        <div class="dd-item" data-code="nl" data-name="NL" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/nl.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/nl.svg" alt=""/>Nederland<span class="dd-cur">€</span></div>
+        <div class="dd-item" data-code="br" data-name="BR" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/br.svg" alt=""/>Brasil<span class="dd-cur">R$</span></div>
+        <div class="dd-item" data-code="us" data-name="US" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/us.svg" alt=""/>United States<span class="dd-cur">$</span></div>
+        <div class="dd-item" data-code="mx" data-name="MX" data-flag="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg" onclick="selectCountry(this)"><img class="flag" src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/flags/4x3/mx.svg" alt=""/>México<span class="dd-cur">MX$</span></div>
       </div>
     </div>
-
-    <div class="nav-sep"></div>
-
-    <!-- Plate input -->
-    <div class="nav-pill" style="cursor:default;gap:6px">
-      <span class="pill-lbl">Plate</span>
-      <input id="plate-input" type="text" placeholder="1234 ABC"
-        style="border:none;outline:none;font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;background:transparent;width:80px;text-transform:uppercase;letter-spacing:.08em"
-        oninput="state.plate=this.value.toUpperCase();this.value=this.value.toUpperCase()"/>
-    </div>
-
-    <div class="nav-sep"></div>
-
-    <!-- Margin input -->
-    <div class="nav-pill" style="cursor:default;gap:6px">
-      <span class="pill-lbl">Margin</span>
-      <input id="margin-input" type="number" min="1" max="50" value="15"
-        style="border:none;outline:none;font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;background:transparent;width:32px;text-align:right"
-        oninput="state.margin=Math.max(1,Math.min(50,parseInt(this.value)||15))/100"/>
-      <span style="font-size:12px;color:#0a0a0a;font-family:'DM Mono',monospace">%</span>
+    <!-- Language -->
+    <div class="nav-pill" id="lang-pill" onclick="toggleDd('lang-dd')">
+      <span class="pill-val" id="sel-lang">EN</span>
+      <span class="chev">▾</span>
+      <div class="dd" id="lang-dd" style="min-width:120px">
+        <div class="dd-item sel" data-lang="en" onclick="selectLang(this)">English</div>
+        <div class="dd-item" data-lang="es" onclick="selectLang(this)">Español</div>
+        <div class="dd-item" data-lang="fr" onclick="selectLang(this)">Français</div>
+        <div class="dd-item" data-lang="de" onclick="selectLang(this)">Deutsch</div>
+        <div class="dd-item" data-lang="nl" onclick="selectLang(this)">Nederlands</div>
+        <div class="dd-item" data-lang="pt" onclick="selectLang(this)">Português</div>
+      </div>
     </div>
   </div>
-
-  <div class="nav-right">AI Powered</div>
 </nav>
 
-<!-- ── Page ───────────────────────────────────────────────────────────────── -->
+<!-- ── Settings bar ── -->
+<div class="settings-bar">
+  <div class="sb-item">
+    <span class="sb-lbl" id="lbl-plate">Plate</span>
+    <input id="plate-input" class="sb-input" type="text" placeholder="1234 ABC" style="width:100px;text-transform:uppercase;letter-spacing:.08em"
+      oninput="state.plate=this.value.toUpperCase();this.value=this.value.toUpperCase()"/>
+  </div>
+  <div class="sb-sep"></div>
+  <div class="sb-item">
+    <span class="sb-lbl" id="lbl-margin">Margin</span>
+    <input id="margin-input" class="sb-input" type="number" min="1" max="50" value="15" style="width:52px;text-align:right"
+      oninput="state.margin=Math.max(1,Math.min(50,parseInt(this.value)||15))/100"/>
+    <span style="font-size:12px;color:#aaa">%</span>
+  </div>
+</div>
+
+<!-- ── Page ── -->
 <div class="page">
 
-  <!-- Section header -->
+  <!-- Upload header -->
   <div class="section-hd">
     <div class="section-title">
-      Upload vehicle photos
-      <span class="section-req">* all angles recommended</span>
+      <span id="lbl-upload-title">Upload vehicle photos</span>
     </div>
-    <div class="section-sub">Photograph each side clearly · avoid reflections · ensure full vehicle is visible in frame</div>
+    <div class="section-sub" id="lbl-upload-sub">Photograph each side clearly · full vehicle in frame · good lighting</div>
   </div>
 
-  <!-- Photo slots -->
+  <!-- Photo counter -->
+  <div class="photo-counter" id="photo-counter">
+    <div class="pc-dots">
+      <div class="pc-dot" id="pc-dot-0"></div>
+      <div class="pc-dot" id="pc-dot-1"></div>
+      <div class="pc-dot" id="pc-dot-2"></div>
+      <div class="pc-dot" id="pc-dot-3"></div>
+    </div>
+    <span class="pc-text" id="pc-text">0 / 4</span>
+    <span class="pc-badge grey" id="pc-badge">—</span>
+  </div>
+
+  <!-- Photo grid -->
   <div class="photo-grid">
     <div class="slot active" id="slot-0" onclick="triggerUpload(0)">
-      <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
-        <rect x="3" y="12" width="58" height="20" rx="3" fill="#eef1f4" stroke="#1a1a1a" stroke-width="1.2"/>
-        <path d="M16 12 L20 5 L44 5 L48 12" fill="#dce6ef" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round"/>
-        <rect x="4" y="14" width="11" height="7" rx="1.5" fill="#cce0f0" stroke="#1a1a1a" stroke-width="0.9"/>
-        <rect x="49" y="14" width="11" height="7" rx="1.5" fill="#cce0f0" stroke="#1a1a1a" stroke-width="0.9"/>
-        <rect x="22" y="25" width="20" height="4" rx="1.5" fill="#d4d4d4" stroke="#999" stroke-width="0.7"/>
-        <circle cx="12" cy="32" r="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/><circle cx="12" cy="32" r="3.5" fill="#d0d0d0"/>
-        <circle cx="52" cy="32" r="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/><circle cx="52" cy="32" r="3.5" fill="#d0d0d0"/>
-        <circle cx="32" cy="9" r="1.8" fill="#cc0000"/>
-        <line x1="32" y1="4" x2="32" y2="7.2" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/>
-        <line x1="32" y1="10.8" x2="32" y2="14" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/>
-        <line x1="27" y1="9" x2="30.2" y2="9" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/>
-        <line x1="33.8" y1="9" x2="37" y2="9" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/>
-      </svg>
-      <div class="slot-lbl">Front</div>
-      <button class="add-btn" onclick="triggerUpload(0);event.stopPropagation()">
-        <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 7.5L7.5 1.5M4 1.5L7.5 1.5L7.5 5" stroke="#777" stroke-width="1.1" stroke-linecap="round"/></svg>
-        Add photo
-      </button>
+      <div class="slot-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="7" width="24" height="17" rx="3" stroke="#0a0a0a" stroke-width="1.3"/><circle cx="14" cy="15" r="4.5" stroke="#0a0a0a" stroke-width="1.3"/><path d="M9 7V6a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#0a0a0a" stroke-width="1.3"/><circle cx="22" cy="11" r="1.2" fill="#0a0a0a"/></svg>
+        <div style="font-size:18px;line-height:1;margin-top:2px">↑</div>
+      </div>
+      <div class="slot-lbl" data-slot="front">Front</div>
+      <div class="slot-hint" data-slot-hint="front">Face the front</div>
     </div>
-
     <div class="slot" id="slot-1" onclick="triggerUpload(1)">
-      <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
-        <rect x="3" y="12" width="58" height="20" rx="3" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/>
-        <path d="M16 12 L20 5 L44 5 L48 12" fill="#f2f2f2" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/>
-        <rect x="4" y="14" width="11" height="7" rx="1.5" fill="#fde0e0" stroke="#ccc" stroke-width="0.9"/>
-        <rect x="49" y="14" width="11" height="7" rx="1.5" fill="#fde0e0" stroke="#ccc" stroke-width="0.9"/>
-        <rect x="22" y="25" width="20" height="4" rx="1.5" fill="#e8e8e8" stroke="#ccc" stroke-width="0.7"/>
-        <line x1="16" y1="12" x2="48" y2="12" stroke="#ddd" stroke-width="0.8"/>
-        <circle cx="12" cy="32" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="12" cy="32" r="3.5" fill="#e8e8e8"/>
-        <circle cx="52" cy="32" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="52" cy="32" r="3.5" fill="#e8e8e8"/>
-      </svg>
-      <div class="slot-lbl-m">Rear</div>
-      <button class="add-btn-m" onclick="triggerUpload(1);event.stopPropagation()">
-        <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 7.5L7.5 1.5M4 1.5L7.5 1.5L7.5 5" stroke="#ccc" stroke-width="1.1" stroke-linecap="round"/></svg>
-        Add photo
-      </button>
+      <div class="slot-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="7" width="24" height="17" rx="3" stroke="#ccc" stroke-width="1.3"/><circle cx="14" cy="15" r="4.5" stroke="#ccc" stroke-width="1.3"/><path d="M9 7V6a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#ccc" stroke-width="1.3"/><circle cx="22" cy="11" r="1.2" fill="#ccc"/></svg>
+        <div style="font-size:18px;line-height:1;margin-top:2px;color:#ccc">↓</div>
+      </div>
+      <div class="slot-lbl-m" data-slot="rear">Rear</div>
+      <div class="slot-hint" data-slot-hint="rear">Face the rear</div>
     </div>
-
     <div class="slot" id="slot-2" onclick="triggerUpload(2)">
-      <svg width="76" height="40" viewBox="0 0 76 40" fill="none">
-        <rect x="3" y="18" width="70" height="13" rx="2.5" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/>
-        <path d="M14 18 L20 10 Q22 7 30 7 L48 7 Q56 7 58 10 L64 18" fill="#eef3f7" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/>
-        <path d="M21 10 Q23 8 30 8 L39 8 L39 17 L19 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/>
-        <path d="M41 8 L48 8 Q54 8 57 11 L62 17 L41 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/>
-        <line x1="40" y1="8" x2="40" y2="18" stroke="#ccc" stroke-width="0.9"/>
-        <line x1="3" y1="25" x2="73" y2="25" stroke="#e8e8e8" stroke-width="0.7"/>
-        <rect x="26" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/>
-        <rect x="47" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/>
-        <path d="M15 17 L16 15 L21 15 L21 17" fill="#e8e8e8" stroke="#ccc" stroke-width="0.8"/>
-        <circle cx="14" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="14" cy="31" r="3.5" fill="#e4e4e4"/>
-        <circle cx="60" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="60" cy="31" r="3.5" fill="#e4e4e4"/>
-      </svg>
-      <div class="slot-lbl-m">Left Side<span class="slot-sub">(Driver)</span></div>
-      <button class="add-btn-m" onclick="triggerUpload(2);event.stopPropagation()">
-        <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 7.5L7.5 1.5M4 1.5L7.5 1.5L7.5 5" stroke="#ccc" stroke-width="1.1" stroke-linecap="round"/></svg>
-        Add photo
-      </button>
+      <div class="slot-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="7" width="24" height="17" rx="3" stroke="#ccc" stroke-width="1.3"/><circle cx="14" cy="15" r="4.5" stroke="#ccc" stroke-width="1.3"/><path d="M9 7V6a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#ccc" stroke-width="1.3"/><circle cx="22" cy="11" r="1.2" fill="#ccc"/></svg>
+        <div style="font-size:18px;line-height:1;margin-top:2px;color:#ccc">←</div>
+      </div>
+      <div class="slot-lbl-m" data-slot="left">Left Side</div>
+      <div class="slot-hint" data-slot-hint="left">Driver side</div>
     </div>
-
     <div class="slot" id="slot-3" onclick="triggerUpload(3)">
-      <svg width="76" height="40" viewBox="0 0 76 40" fill="none" style="transform:scaleX(-1)">
-        <rect x="3" y="18" width="70" height="13" rx="2.5" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/>
-        <path d="M14 18 L20 10 Q22 7 30 7 L48 7 Q56 7 58 10 L64 18" fill="#eef3f7" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/>
-        <path d="M21 10 Q23 8 30 8 L39 8 L39 17 L19 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/>
-        <path d="M41 8 L48 8 Q54 8 57 11 L62 17 L41 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/>
-        <line x1="40" y1="8" x2="40" y2="18" stroke="#ccc" stroke-width="0.9"/>
-        <line x1="3" y1="25" x2="73" y2="25" stroke="#e8e8e8" stroke-width="0.7"/>
-        <rect x="26" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/>
-        <rect x="47" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/>
-        <path d="M15 17 L16 15 L21 15 L21 17" fill="#e8e8e8" stroke="#ccc" stroke-width="0.8"/>
-        <circle cx="14" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="14" cy="31" r="3.5" fill="#e4e4e4"/>
-        <circle cx="60" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="60" cy="31" r="3.5" fill="#e4e4e4"/>
-      </svg>
-      <div class="slot-lbl-m">Right Side<span class="slot-sub">(Passenger)</span></div>
-      <button class="add-btn-m" onclick="triggerUpload(3);event.stopPropagation()">
-        <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 7.5L7.5 1.5M4 1.5L7.5 1.5L7.5 5" stroke="#ccc" stroke-width="1.1" stroke-linecap="round"/></svg>
-        Add photo
-      </button>
+      <div class="slot-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="7" width="24" height="17" rx="3" stroke="#ccc" stroke-width="1.3"/><circle cx="14" cy="15" r="4.5" stroke="#ccc" stroke-width="1.3"/><path d="M9 7V6a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#ccc" stroke-width="1.3"/><circle cx="22" cy="11" r="1.2" fill="#ccc"/></svg>
+        <div style="font-size:18px;line-height:1;margin-top:2px;color:#ccc">→</div>
+      </div>
+      <div class="slot-lbl-m" data-slot="right">Right Side</div>
+      <div class="slot-hint" data-slot-hint="right">Passenger side</div>
     </div>
   </div>
 
-  <!-- Hidden file inputs -->
-  <input type="file" id="file-0" accept="image/*" onchange="handleFile(0,this)"/>
-  <input type="file" id="file-1" accept="image/*" onchange="handleFile(1,this)"/>
-  <input type="file" id="file-2" accept="image/*" onchange="handleFile(2,this)"/>
-  <input type="file" id="file-3" accept="image/*" onchange="handleFile(3,this)"/>
+  <input type="file" id="file-0" accept="image/*" capture="environment" onchange="handleFile(0,this)"/>
+  <input type="file" id="file-1" accept="image/*" capture="environment" onchange="handleFile(1,this)"/>
+  <input type="file" id="file-2" accept="image/*" capture="environment" onchange="handleFile(2,this)"/>
+  <input type="file" id="file-3" accept="image/*" capture="environment" onchange="handleFile(3,this)"/>
 
   <!-- Analyse button -->
-  <div class="analyse-wrap">
+  <div class="analyse-wrap" style="margin-top:16px">
     <button class="analyse-btn" id="analyse-btn" onclick="analyse()" disabled>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-        <circle cx="7" cy="7" r="6" stroke="white" stroke-width="1"/>
-        <circle cx="7" cy="7" r="3" stroke="white" stroke-width="1"/>
-        <circle cx="7" cy="7" r="1.2" fill="white"/>
-      </svg>
-      Analyse Vehicle
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="white" stroke-width="1"/><circle cx="7" cy="7" r="3" stroke="white" stroke-width="1"/><circle cx="7" cy="7" r="1.2" fill="white"/></svg>
+      <span id="lbl-analyse">Analyse Vehicle</span>
     </button>
   </div>
 
-  <!-- Results section (hidden until analyse) -->
+  <!-- Results -->
   <div id="results-section" style="display:none">
     <div class="divider"></div>
     <div class="results-header">
       <div class="results-step">2</div>
-      <div class="results-title">Assessment results</div>
+      <div class="results-title" id="lbl-results-title">Assessment Results</div>
     </div>
     <div id="results-content"></div>
   </div>
@@ -336,34 +337,157 @@ input[type=file]{display:none}
 <!-- Footer -->
 <div class="footer">
   <span>Autoshot · Vehicle Damage Intelligence</span>
-  <span id="footer-model">Model v12 · 7 damage classes</span>
+  <span>YOLO v5 + Claude Vision · 8 markets</span>
 </div>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-const state = {
-  country: 'es',
-  margin: 0.15,
-  plate: '',
-  files: [null, null, null, null],
-  currency: {'es':'€','pt':'€','br':'R$','us':'$','mx':'MX$'},
-  countryNames: {'es':'Spain','pt':'Portugal','br':'Brazil','us':'United States','mx':'México'},
+// ── Translations ──────────────────────────────────────────────────────────────
+const T = {
+  en: {
+    upload_title:'Upload vehicle photos', upload_sub:'Photograph each side clearly · full vehicle in frame · good lighting',
+    slot_front:'Front', slot_rear:'Rear', slot_left:'Left Side', slot_right:'Right Side',
+    hint_front:'Face the front', hint_rear:'Face the rear', hint_left:'Driver side', hint_right:'Passenger side',
+    analyse:'Analyse Vehicle', results_title:'Assessment Results',
+    market_value:'Market Value', repair_estimate:'Repair Estimate',
+    max_offer:'Maximum Purchase Offer', dealer_bid:'Recommended dealer bid',
+    structural_repairs:'Structural repairs (AI vision)', cosmetic_repairs:'Cosmetic repairs (AI analysis)',
+    dealer_margin:'Dealer margin', no_damage:'No structural damage detected — cosmetic damage may require manual inspection',
+    new_assessment:'New Assessment', print_report:'Print Report',
+    plate:'Plate', margin:'Margin', ai_analysis:'AI Visual Analysis',
+    labour:'labour rates · Indicative estimates', footer_model:'YOLO v5 + Claude Vision · 8 markets',
+    photos:'photos', of:'of', optimal:'Optimal — 4 photos', good:'Good — analysis may vary', minimum:'Minimum — limited accuracy', add_photo:'Tap to add photo',
+  },
+  es: {
+    upload_title:'Subir fotos del vehículo', upload_sub:'Fotografía cada lado con claridad · vehículo completo en el encuadre · buena iluminación',
+    slot_front:'Frontal', slot_rear:'Trasera', slot_left:'Lado Izquierdo', slot_right:'Lado Derecho',
+    hint_front:'Enfoca el frontal', hint_rear:'Enfoca la trasera', hint_left:'Lado conductor', hint_right:'Lado pasajero',
+    analyse:'Analizar Vehículo', results_title:'Resultados del análisis',
+    market_value:'Valor de Mercado', repair_estimate:'Estimación de Reparación',
+    max_offer:'Oferta Máxima de Compra', dealer_bid:'Oferta recomendada',
+    structural_repairs:'Reparaciones estructurales', cosmetic_repairs:'Reparaciones cosméticas',
+    dealer_margin:'Margen del dealer', no_damage:'No se detectaron daños estructurales — puede requerirse inspección manual para daños cosméticos',
+    new_assessment:'Nueva Evaluación', print_report:'Imprimir Informe',
+    plate:'Matrícula', margin:'Margen', ai_analysis:'Análisis Visual IA',
+    labour:'mano de obra local · Estimaciones orientativas', footer_model:'YOLO v5 + Claude Vision · 8 mercados',
+    photos:'fotos', of:'de', optimal:'Óptimo — 4 fotos', good:'Bueno — el análisis puede variar', minimum:'Mínimo — precisión limitada', add_photo:'Toca para añadir foto',
+  },
+  fr: {
+    upload_title:'Télécharger les photos du véhicule', upload_sub:'Photographiez chaque côté clairement · véhicule entier dans le cadre · bonne lumière',
+    slot_front:'Avant', slot_rear:'Arrière', slot_left:'Côté Gauche', slot_right:'Côté Droit',
+    hint_front:'Face avant', hint_rear:'Face arrière', hint_left:'Côté conducteur', hint_right:'Côté passager',
+    analyse:'Analyser le Véhicule', results_title:'Résultats de l\'évaluation',
+    market_value:'Valeur Marché', repair_estimate:'Estimation Réparation',
+    max_offer:'Offre d\'Achat Maximum', dealer_bid:'Offre recommandée',
+    structural_repairs:'Réparations structurelles', cosmetic_repairs:'Réparations cosmétiques',
+    dealer_margin:'Marge concessionnaire', no_damage:'Aucun dommage structurel détecté — une inspection manuelle peut être nécessaire',
+    new_assessment:'Nouvelle Évaluation', print_report:'Imprimer le Rapport',
+    plate:'Plaque', margin:'Marge', ai_analysis:'Analyse Visuelle IA',
+    labour:'tarifs locaux · Estimations indicatives', footer_model:'YOLO v5 + Claude Vision · 8 marchés',
+    photos:'photos', of:'sur', optimal:'Optimal — 4 photos', good:'Bon — l\'analyse peut varier', minimum:'Minimum — précision limitée', add_photo:'Appuyer pour ajouter',
+  },
+  de: {
+    upload_title:'Fahrzeugfotos hochladen', upload_sub:'Fotografieren Sie jede Seite klar · gesamtes Fahrzeug im Bild · gute Beleuchtung',
+    slot_front:'Vorne', slot_rear:'Hinten', slot_left:'Links', slot_right:'Rechts',
+    hint_front:'Fahrzeugfront', hint_rear:'Fahrzeugheck', hint_left:'Fahrerseite', hint_right:'Beifahrerseite',
+    analyse:'Fahrzeug analysieren', results_title:'Bewertungsergebnisse',
+    market_value:'Marktwert', repair_estimate:'Reparaturschätzung',
+    max_offer:'Maximales Kaufangebot', dealer_bid:'Empfohlenes Händlerangebot',
+    structural_repairs:'Strukturreparaturen', cosmetic_repairs:'Kosmetische Reparaturen',
+    dealer_margin:'Händlermarge', no_damage:'Keine Strukturschäden erkannt — kosmetische Schäden erfordern möglicherweise manuelle Inspektion',
+    new_assessment:'Neue Bewertung', print_report:'Bericht drucken',
+    plate:'Kennzeichen', margin:'Marge', ai_analysis:'KI-Sichtanalyse',
+    labour:'lokale Arbeitstarife · Richtpreise', footer_model:'YOLO v5 + Claude Vision · 8 Märkte',
+    photos:'Fotos', of:'von', optimal:'Optimal — 4 Fotos', good:'Gut — Analyse kann variieren', minimum:'Minimal — eingeschränkte Genauigkeit', add_photo:'Tippen zum Hinzufügen',
+  },
+  nl: {
+    upload_title:'Voertuigfoto\'s uploaden', upload_sub:'Fotografeer elke kant duidelijk · volledig voertuig in beeld · goede belichting',
+    slot_front:'Voorkant', slot_rear:'Achterkant', slot_left:'Linkerkant', slot_right:'Rechterkant',
+    hint_front:'Voorkant voertuig', hint_rear:'Achterkant voertuig', hint_left:'Bestuurderskant', hint_right:'Passagierskant',
+    analyse:'Voertuig analyseren', results_title:'Beoordelingsresultaten',
+    market_value:'Marktwaarde', repair_estimate:'Reparatieschatting',
+    max_offer:'Maximaal Koopbod', dealer_bid:'Aanbevolen dealerbod',
+    structural_repairs:'Structurele reparaties', cosmetic_repairs:'Cosmetische reparaties',
+    dealer_margin:'Dealermarge', no_damage:'Geen structurele schade gedetecteerd — cosmetische schade vereist mogelijk handmatige inspectie',
+    new_assessment:'Nieuwe Beoordeling', print_report:'Rapport afdrukken',
+    plate:'Kenteken', margin:'Marge', ai_analysis:'AI Visuele Analyse',
+    labour:'lokale tarieven · Indicatieve schattingen', footer_model:'YOLO v5 + Claude Vision · 8 markten',
+    photos:'foto\'s', of:'van', optimal:'Optimaal — 4 foto\'s', good:'Goed — analyse kan variëren', minimum:'Minimaal — beperkte nauwkeurigheid', add_photo:'Tik om toe te voegen',
+  },
+  pt: {
+    upload_title:'Carregar fotos do veículo', upload_sub:'Fotografe cada lado claramente · veículo completo no enquadramento · boa iluminação',
+    slot_front:'Frontal', slot_rear:'Traseira', slot_left:'Lado Esquerdo', slot_right:'Lado Direito',
+    hint_front:'Vista frontal', hint_rear:'Vista traseira', hint_left:'Lado do condutor', hint_right:'Lado do passageiro',
+    analyse:'Analisar Veículo', results_title:'Resultados da Avaliação',
+    market_value:'Valor de Mercado', repair_estimate:'Estimativa de Reparação',
+    max_offer:'Oferta Máxima de Compra', dealer_bid:'Oferta recomendada',
+    structural_repairs:'Reparações estruturais', cosmetic_repairs:'Reparações cosméticas',
+    dealer_margin:'Margem do dealer', no_damage:'Nenhum dano estrutural detectado — danos cosméticos podem requerer inspeção manual',
+    new_assessment:'Nova Avaliação', print_report:'Imprimir Relatório',
+    plate:'Matrícula', margin:'Margem', ai_analysis:'Análise Visual IA',
+    labour:'taxas locais · Estimativas indicativas', footer_model:'YOLO v5 + Claude Vision · 8 mercados',
+    photos:'fotos', of:'de', optimal:'Ideal — 4 fotos', good:'Bom — análise pode variar', minimum:'Mínimo — precisão limitada', add_photo:'Toque para adicionar',
+  },
 };
 
-const SEVERITY = {
-  'dent':'medium','scratch':'low','crack':'high',
-  'glass shatter':'critical','lamp broken':'high',
-  'tire flat':'critical','paint damage':'low',
+// ── Plate formats ─────────────────────────────────────────────────────────────
+const PLATE_FMT = {
+  es:'1234 ABC', pt:'AB-12-CD', fr:'AB-123-CD',
+  de:'AB CD 1234', nl:'AB-123-CD', br:'ABC-1234', us:'ABC 1234', mx:'ABC-123-D',
 };
+
+// ── Country data ──────────────────────────────────────────────────────────────
+const CURRENCY = {es:'€',pt:'€',fr:'€',de:'€',nl:'€',br:'R$',us:'$',mx:'MX$'};
+const CNAME    = {es:'Spain',pt:'Portugal',fr:'France',de:'Germany',nl:'Netherlands',br:'Brazil',us:'United States',mx:'México'};
+
+// ── Severity ──────────────────────────────────────────────────────────────────
+const SEVERITY  = {'dent':'medium','scratch':'low','crack':'high','glass shatter':'critical','lamp broken':'high','tire flat':'critical','paint damage':'low'};
 const SEV_COLOR = {'critical':'#cc0000','high':'#f87171','medium':'#fb923c','low':'#d4a843'};
+const SEV_CLASS = {'critical':'sev-critical','high':'sev-high','medium':'sev-medium','low':'sev-low'};
 
-// ── Dropdowns ──────────────────────────────────────────────────────────────
+// ── State ─────────────────────────────────────────────────────────────────────
+const state = {
+  country:'es', lang:'en', margin:0.15, plate:'',
+  files:[null,null,null,null],
+};
+
+function t(key){ return (T[state.lang]||T.en)[key] || (T.en)[key] || key; }
+
+// ── Language ──────────────────────────────────────────────────────────────────
+function selectLang(el) {
+  event.stopPropagation();
+  state.lang = el.dataset.lang;
+  document.getElementById('sel-lang').textContent = el.dataset.lang.toUpperCase();
+  document.querySelectorAll('#lang-dd .dd-item').forEach(i=>i.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('lang-dd').classList.remove('open');
+  applyTranslations();
+}
+
+function applyTranslations() {
+  document.getElementById('lbl-upload-title').textContent = t('upload_title');
+  document.getElementById('lbl-upload-sub').textContent   = t('upload_sub');
+  document.getElementById('lbl-analyse').textContent      = t('analyse');
+  document.getElementById('lbl-results-title').textContent= t('results_title');
+  document.getElementById('lbl-plate').textContent        = t('plate');
+  document.getElementById('lbl-margin').textContent       = t('margin');
+  // Slot labels
+  const keys = ['front','rear','left','right'];
+  keys.forEach((k,i) => {
+    const lbl = document.querySelector(`#slot-${i} [data-slot="${k}"]`);
+    const hint = document.querySelector(`#slot-${i} [data-slot-hint="${k}"]`);
+    if(lbl) lbl.textContent = t('slot_'+k);
+    if(hint) hint.textContent = t('hint_'+k);
+  });
+  updateCounter();
+}
+
+// ── Dropdowns ─────────────────────────────────────────────────────────────────
 function toggleDd(id) {
   event.stopPropagation();
   const dd = document.getElementById(id);
   const isOpen = dd.classList.contains('open');
-  document.querySelectorAll('.dd').forEach(d => d.classList.remove('open'));
-  if (!isOpen) dd.classList.add('open');
+  document.querySelectorAll('.dd').forEach(d=>d.classList.remove('open'));
+  if(!isOpen) dd.classList.add('open');
 }
 
 function selectCountry(el) {
@@ -371,247 +495,236 @@ function selectCountry(el) {
   state.country = el.dataset.code;
   document.getElementById('sel-flag').src = el.dataset.flag;
   document.getElementById('sel-country').textContent = el.dataset.name;
-  document.querySelectorAll('#market-dd .dd-item').forEach(i => i.classList.remove('sel'));
+  document.querySelectorAll('#market-dd .dd-item').forEach(i=>i.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('market-dd').classList.remove('open');
+  // Update plate placeholder
+  document.getElementById('plate-input').placeholder = PLATE_FMT[state.country] || '—';
 }
 
-document.addEventListener('click', () => {
-  document.querySelectorAll('.dd').forEach(d => d.classList.remove('open'));
-});
+document.addEventListener('click', ()=>document.querySelectorAll('.dd').forEach(d=>d.classList.remove('open')));
 
-// ── File upload ────────────────────────────────────────────────────────────
-function triggerUpload(i) {
-  document.getElementById('file-' + i).click();
+// ── Photo counter ─────────────────────────────────────────────────────────────
+function updateCounter() {
+  const count = state.files.filter(f=>f!==null).length;
+  const dots   = document.querySelectorAll('.pc-dot');
+  const text   = document.getElementById('pc-text');
+  const badge  = document.getElementById('pc-badge');
+  let color = 'grey', badgeText = '—';
+  if(count===4){ color='green'; badgeText=t('optimal'); }
+  else if(count>=2){ color='amber'; badgeText=t('good'); }
+  else if(count===1){ color='red'; badgeText=t('minimum'); }
+  dots.forEach((d,i)=>{ d.className='pc-dot'+(i<count?' '+color:''); });
+  text.textContent = count+' '+t('of')+' 4 '+t('photos');
+  badge.className  = 'pc-badge '+color;
+  badge.textContent = badgeText;
 }
+
+// ── File upload ───────────────────────────────────────────────────────────────
+function triggerUpload(i){ document.getElementById('file-'+i).click(); }
 
 function handleFile(i, input) {
-  if (!input.files[0]) return;
+  if(!input.files[0]) return;
   state.files[i] = input.files[0];
-  const slot = document.getElementById('slot-' + i);
+  const slot = document.getElementById('slot-'+i);
   const url  = URL.createObjectURL(input.files[0]);
-
   slot.innerHTML = `
-    <img src="${url}" alt="photo" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>
-    <div class="slot-overlay" onclick="clearSlot(${i});event.stopPropagation()">✕ Remove</div>
-  `;
+    <img src="${url}" alt="photo" style="width:100%;height:100%;object-fit:cover;border-radius:10px;display:block"/>
+    <div class="slot-overlay" onclick="clearSlot(${i});event.stopPropagation()">✕</div>`;
   slot.classList.add('filled');
   slot.classList.remove('active');
   updateAnalyseBtn();
+  updateCounter();
 }
 
 function clearSlot(i) {
   state.files[i] = null;
-  document.getElementById('file-' + i).value = '';
-  const slot = document.getElementById('slot-' + i);
+  document.getElementById('file-'+i).value = '';
+  const slot = document.getElementById('slot-'+i);
   slot.classList.remove('filled');
-  if (i === 0) slot.classList.add('active');
+  if(i===0) slot.classList.add('active'); else slot.classList.remove('active');
   renderSlotDefault(i, slot);
   updateAnalyseBtn();
+  updateCounter();
 }
 
-const SLOT_DEFS = [
-  { lbl:'Front', lbl_cls:'slot-lbl', btn_cls:'add-btn', btn_stroke:'#777',
-    svg:`<svg width="64" height="42" viewBox="0 0 64 42" fill="none"><rect x="3" y="12" width="58" height="20" rx="3" fill="#eef1f4" stroke="#1a1a1a" stroke-width="1.2"/><path d="M16 12 L20 5 L44 5 L48 12" fill="#dce6ef" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round"/><rect x="4" y="14" width="11" height="7" rx="1.5" fill="#cce0f0" stroke="#1a1a1a" stroke-width="0.9"/><rect x="49" y="14" width="11" height="7" rx="1.5" fill="#cce0f0" stroke="#1a1a1a" stroke-width="0.9"/><rect x="22" y="25" width="20" height="4" rx="1.5" fill="#d4d4d4" stroke="#999" stroke-width="0.7"/><circle cx="12" cy="32" r="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/><circle cx="12" cy="32" r="3.5" fill="#d0d0d0"/><circle cx="52" cy="32" r="7" fill="#fff" stroke="#1a1a1a" stroke-width="1.2"/><circle cx="52" cy="32" r="3.5" fill="#d0d0d0"/><circle cx="32" cy="9" r="1.8" fill="#cc0000"/><line x1="32" y1="4" x2="32" y2="7.2" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/><line x1="32" y1="10.8" x2="32" y2="14" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/><line x1="27" y1="9" x2="30.2" y2="9" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/><line x1="33.8" y1="9" x2="37" y2="9" stroke="#cc0000" stroke-width="1" stroke-linecap="round"/></svg>` },
-  { lbl:'Rear', lbl_cls:'slot-lbl-m', btn_cls:'add-btn-m', btn_stroke:'#ccc',
-    svg:`<svg width="64" height="42" viewBox="0 0 64 42" fill="none"><rect x="3" y="12" width="58" height="20" rx="3" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/><path d="M16 12 L20 5 L44 5 L48 12" fill="#f2f2f2" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/><rect x="4" y="14" width="11" height="7" rx="1.5" fill="#fde0e0" stroke="#ccc" stroke-width="0.9"/><rect x="49" y="14" width="11" height="7" rx="1.5" fill="#fde0e0" stroke="#ccc" stroke-width="0.9"/><rect x="22" y="25" width="20" height="4" rx="1.5" fill="#e8e8e8" stroke="#ccc" stroke-width="0.7"/><line x1="16" y1="12" x2="48" y2="12" stroke="#ddd" stroke-width="0.8"/><circle cx="12" cy="32" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="12" cy="32" r="3.5" fill="#e8e8e8"/><circle cx="52" cy="32" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="52" cy="32" r="3.5" fill="#e8e8e8"/></svg>` },
-  { lbl:'Left Side', sub:'(Driver)', lbl_cls:'slot-lbl-m', btn_cls:'add-btn-m', btn_stroke:'#ccc',
-    svg:`<svg width="76" height="40" viewBox="0 0 76 40" fill="none"><rect x="3" y="18" width="70" height="13" rx="2.5" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/><path d="M14 18 L20 10 Q22 7 30 7 L48 7 Q56 7 58 10 L64 18" fill="#eef3f7" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/><path d="M21 10 Q23 8 30 8 L39 8 L39 17 L19 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/><path d="M41 8 L48 8 Q54 8 57 11 L62 17 L41 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/><line x1="40" y1="8" x2="40" y2="18" stroke="#ccc" stroke-width="0.9"/><line x1="3" y1="25" x2="73" y2="25" stroke="#e8e8e8" stroke-width="0.7"/><rect x="26" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/><rect x="47" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/><path d="M15 17 L16 15 L21 15 L21 17" fill="#e8e8e8" stroke="#ccc" stroke-width="0.8"/><circle cx="14" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="14" cy="31" r="3.5" fill="#e4e4e4"/><circle cx="60" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="60" cy="31" r="3.5" fill="#e4e4e4"/></svg>` },
-  { lbl:'Right Side', sub:'(Passenger)', lbl_cls:'slot-lbl-m', btn_cls:'add-btn-m', btn_stroke:'#ccc',
-    svg:`<svg width="76" height="40" viewBox="0 0 76 40" fill="none" style="transform:scaleX(-1)"><rect x="3" y="18" width="70" height="13" rx="2.5" fill="#f8f8f8" stroke="#ccc" stroke-width="1.2"/><path d="M14 18 L20 10 Q22 7 30 7 L48 7 Q56 7 58 10 L64 18" fill="#eef3f7" stroke="#ccc" stroke-width="1.2" stroke-linejoin="round"/><path d="M21 10 Q23 8 30 8 L39 8 L39 17 L19 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/><path d="M41 8 L48 8 Q54 8 57 11 L62 17 L41 17Z" fill="#ddeaf4" stroke="#ccc" stroke-width="0.8"/><line x1="40" y1="8" x2="40" y2="18" stroke="#ccc" stroke-width="0.9"/><line x1="3" y1="25" x2="73" y2="25" stroke="#e8e8e8" stroke-width="0.7"/><rect x="26" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/><rect x="47" y="23" width="8" height="2" rx="1" fill="#d0d0d0"/><path d="M15 17 L16 15 L21 15 L21 17" fill="#e8e8e8" stroke="#ccc" stroke-width="0.8"/><circle cx="14" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="14" cy="31" r="3.5" fill="#e4e4e4"/><circle cx="60" cy="31" r="7" fill="#fff" stroke="#ccc" stroke-width="1.2"/><circle cx="60" cy="31" r="3.5" fill="#e4e4e4"/></svg>` },
-];
-
+const SLOT_ARROWS = ['↑','↓','←','→'];
+const SLOT_KEYS   = ['front','rear','left','right'];
 function renderSlotDefault(i, slot) {
-  const d = SLOT_DEFS[i];
-  const subHtml = d.sub ? `<span class="slot-sub">${d.sub}</span>` : '';
-  slot.onclick = () => triggerUpload(i);
+  const active = i===0;
+  const stroke = active ? '#0a0a0a' : '#ccc';
+  const arrow  = `<div style="font-size:18px;line-height:1;margin-top:2px;color:${stroke}">${SLOT_ARROWS[i]}</div>`;
+  const lbl    = active ? 'slot-lbl' : 'slot-lbl-m';
+  slot.onclick  = ()=>triggerUpload(i);
   slot.innerHTML = `
-    ${d.svg}
-    <div class="${d.lbl_cls}">${d.lbl}${subHtml}</div>
-    <button class="${d.btn_cls}" onclick="triggerUpload(${i});event.stopPropagation()">
-      <svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M1.5 7.5L7.5 1.5M4 1.5L7.5 1.5L7.5 5" stroke="${d.btn_stroke}" stroke-width="1.1" stroke-linecap="round"/></svg>
-      Add photo
-    </button>
-  `;
+    <div class="slot-icon" style="${active?'':'opacity:.4'}">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="2" y="7" width="24" height="17" rx="3" stroke="${stroke}" stroke-width="1.3"/><circle cx="14" cy="15" r="4.5" stroke="${stroke}" stroke-width="1.3"/><path d="M9 7V6a2 2 0 012-2h6a2 2 0 012 2v1" stroke="${stroke}" stroke-width="1.3"/><circle cx="22" cy="11" r="1.2" fill="${stroke}"/></svg>
+      ${arrow}
+    </div>
+    <div class="${lbl}" data-slot="${SLOT_KEYS[i]}">${t('slot_'+SLOT_KEYS[i])}</div>
+    <div class="slot-hint" data-slot-hint="${SLOT_KEYS[i]}">${t('hint_'+SLOT_KEYS[i])}</div>`;
 }
 
 function updateAnalyseBtn() {
-  const hasFile = state.files.some(f => f !== null);
-  document.getElementById('analyse-btn').disabled = !hasFile;
+  document.getElementById('analyse-btn').disabled = !state.files.some(f=>f!==null);
 }
 
-// ── Analyse ────────────────────────────────────────────────────────────────
+// ── Analyse ───────────────────────────────────────────────────────────────────
 async function analyse() {
-  const files = state.files.filter(f => f !== null);
-  if (!files.length) return;
+  const files = state.files.filter(f=>f!==null);
+  if(!files.length) return;
 
-  const resultsSection = document.getElementById('results-section');
-  const resultsContent = document.getElementById('results-content');
-  resultsSection.style.display = 'block';
-  resultsContent.innerHTML = `
-    <div class="spinner-wrap">
-      <div class="spinner"></div>
-      <div class="spinner-text">Identifying vehicle &amp; detecting damage...</div>
-    </div>`;
-  resultsSection.scrollIntoView({behavior:'smooth', block:'start'});
+  const sec = document.getElementById('results-section');
+  const content = document.getElementById('results-content');
+  sec.style.display = 'block';
+  content.innerHTML = `<div class="spinner-wrap"><div class="spinner"></div><div class="spinner-text">${t('analyse')}...</div></div>`;
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
 
   const t0 = Date.now();
   try {
-    // Step 1 — identify vehicle
+    // Identify vehicle
     let vehicle = null;
     const idForm = new FormData();
-    idForm.append('file', state.files[0] || files[0]);
-    const idResp = await fetch(`/identify?country=${state.country}`, {method:'POST', body: idForm});
-    if (idResp.ok) {
-      const idData = await idResp.json();
-      vehicle = idData.vehicle;
+    idForm.append('file', state.files[0]||files[0]);
+    const idResp = await fetch(`/identify?country=${state.country}`, {method:'POST',body:idForm});
+    if(idResp.ok){ const d=await idResp.json(); vehicle=d.vehicle; }
+
+    // Extract plate from photo if not entered manually
+    if(!state.plate && vehicle && vehicle.plate) {
+      state.plate = vehicle.plate;
+      document.getElementById('plate-input').value = vehicle.plate;
     }
 
-    // Steps 2+3 — YOLO detection + Claude damage analysis in parallel
+    // YOLO + Claude in parallel
     const detForm = new FormData();
     const aiForm  = new FormData();
-    files.forEach(f => { detForm.append('files', f); aiForm.append('files', f); });
-
+    files.forEach(f=>{ detForm.append('files',f); aiForm.append('files',f); });
     const marketVal = vehicle ? vehicle.market_value_mid : 0;
     const [detResp, aiResp] = await Promise.all([
-      fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`, {method:'POST', body: detForm}),
-      fetch(`/analyze?country=${state.country}`, {method:'POST', body: aiForm}),
+      fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`,{method:'POST',body:detForm}),
+      fetch(`/analyze?country=${state.country}`,{method:'POST',body:aiForm}),
     ]);
-
-    if (!detResp.ok) throw new Error('Detection failed');
-    const data     = await detResp.json();
-    const aiData   = aiResp.ok ? await aiResp.json() : null;
-    const elapsed  = ((Date.now() - t0) / 1000).toFixed(1);
-
+    if(!detResp.ok) throw new Error('Detection failed');
+    const data   = await detResp.json();
+    const aiData = aiResp.ok ? await aiResp.json() : null;
+    const elapsed = ((Date.now()-t0)/1000).toFixed(1);
     renderResults(vehicle, data, aiData, elapsed);
   } catch(err) {
-    resultsContent.innerHTML = `<div style="color:#cc0000;padding:20px;font-size:13px">Error: ${err.message}</div>`;
+    content.innerHTML = `<div style="color:#cc0000;padding:20px;font-size:13px">Error: ${err.message}</div>`;
   }
 }
 
+// ── Render results ────────────────────────────────────────────────────────────
 function renderResults(vehicle, data, aiData, elapsed) {
-  const sym = state.currency[state.country] || '€';
-  const cname = state.countryNames[state.country] || 'Spain';
-  const r = data.repair;
-  const o = data.offer;
+  const sym   = CURRENCY[state.country]||'€';
+  const cname = CNAME[state.country]||'';
+  const r     = data.repair;
+  const o     = data.offer;
 
-  // Build Claude findings per photo filename
+  // Build Claude findings per photo
   const aiByPhoto = {};
-  if (aiData && aiData.damage_items) {
-    aiData.damage_items.forEach(item => {
-      const key = item.photo || '';
-      if (!aiByPhoto[key]) aiByPhoto[key] = [];
-      aiByPhoto[key].push(item);
+  if(aiData && aiData.damage_items) {
+    aiData.damage_items.forEach(item=>{
+      const k = item.photo||'';
+      if(!aiByPhoto[k]) aiByPhoto[k]=[];
+      aiByPhoto[k].push(item);
     });
   }
 
-  // Annotated images with Claude badges
+  // Annotated images
   let annHtml = '';
-  if (data.annotated_images && data.annotated_images.length) {
-    const cols = Math.min(data.annotated_images.length, 4);
-    annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr)">`;
-    data.annotated_images.forEach(img => {
-      const aiFindings = aiByPhoto[img.filename] || [];
-      const badges = aiFindings.map(f =>
-        `<span style="display:inline-block;background:rgba(204,0,0,0.85);color:#fff;font-size:8px;padding:2px 7px;border-radius:4px;margin:2px 2px 0 0;letter-spacing:.04em">${f.type.replace('_',' ')} · ${f.location}</span>`
-      ).join('');
-      annHtml += `
-        <div>
-          <img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>
-          ${badges ? `<div style="margin-top:6px;line-height:1.4">${badges}</div>` : ''}
-        </div>`;
+  if(data.annotated_images && data.annotated_images.length) {
+    const cols = Math.min(data.annotated_images.length,4);
+    annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${Math.min(cols,2)},1fr)">`;
+    data.annotated_images.forEach(img=>{
+      const findings = aiByPhoto[img.filename]||[];
+      const badges = findings.map(f=>`<span class="ann-badge">${f.type.replace('_',' ')} · ${f.location}</span>`).join('');
+      annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>${badges?`<div class="ann-badges">${badges}</div>`:''}</div>`;
     });
     annHtml += '</div>';
   }
 
-  // Status — combine YOLO + Claude counts
-  const aiItemCount  = aiData && aiData.damage_found ? aiData.damage_items.length : 0;
-  const totalDamage  = data.total_detections + aiItemCount;
-  const statusHtml = totalDamage === 0
-    ? `<div class="status-clean">✓ No structural damage detected — cosmetic damage may require manual inspection</div>`
-    : `<div class="status-damaged">⚠ ${totalDamage} damage instance${totalDamage>1?'s':''} detected · Assessment completed in ${elapsed}s</div>`;
+  // Photo count in results
+  const photoCount = state.files.filter(f=>f!==null).length;
+  const photoColor = photoCount===4?'#22c55e':photoCount>=2?'#f59e0b':'#cc0000';
+  const photoLabel = photoCount===4?t('optimal'):photoCount>=2?t('good'):t('minimum');
+
+  // Status
+  const aiCount   = aiData && aiData.damage_found ? aiData.damage_items.length : 0;
+  const totalDmg  = data.total_detections + aiCount;
+  const statusHtml = totalDmg===0
+    ? `<div class="status-clean">✓ ${t('no_damage')}</div>`
+    : `<div class="status-damaged">⚠ ${totalDmg} damage instance${totalDmg>1?'s':''} detected · ${elapsed}s · <span style="color:${photoColor}">${photoCount}/4 ${t('photos')} — ${photoLabel}</span></div>`;
 
   // Vehicle info
   const makeLine   = vehicle ? `${vehicle.make} ${vehicle.model}` : 'Vehicle';
-  const detailLine = vehicle ? `${vehicle.year_range} · ${vehicle.trim} · ${vehicle.fuel} · ${vehicle.body}` : `Set ANTHROPIC_API_KEY for AI identification`;
-  const mvLow  = vehicle ? vehicle.market_value_low  : 0;
-  const mvHigh = vehicle ? vehicle.market_value_high : 0;
-  const mvStr  = vehicle ? `${sym} ${mvLow.toLocaleString()} – ${sym} ${mvHigh.toLocaleString()}` : '—';
+  const detailLine = vehicle ? `${vehicle.year_range} · ${vehicle.trim} · ${vehicle.fuel} · ${vehicle.body}` : 'Set ANTHROPIC_API_KEY for AI identification';
+  const mvStr      = vehicle ? `${sym} ${vehicle.market_value_low.toLocaleString()} – ${sym} ${vehicle.market_value_high.toLocaleString()}` : '—';
 
-  // Damage rows
-  let dmgHtml = '';
-  // Build avg confidence per class from detections
+  // YOLO damage rows
   const confByClass = {};
-  (data.detections || []).forEach(d => {
-    if (!confByClass[d.class_name]) confByClass[d.class_name] = [];
-    confByClass[d.class_name].push(d.confidence);
-  });
+  (data.detections||[]).forEach(d=>{ if(!confByClass[d.class_name]) confByClass[d.class_name]=[]; confByClass[d.class_name].push(d.confidence); });
   const avgConf = {};
-  Object.keys(confByClass).forEach(k => {
-    avgConf[k] = Math.round(confByClass[k].reduce((a,b)=>a+b,0)/confByClass[k].length*100);
-  });
+  Object.keys(confByClass).forEach(k=>{ avgConf[k]=Math.round(confByClass[k].reduce((a,b)=>a+b,0)/confByClass[k].length*100); });
 
-  if (r.breakdown.length) {
-    r.breakdown.forEach(item => {
-      const sev   = SEVERITY[item.class] || 'medium';
-      const color = SEV_COLOR[sev] || '#fb923c';
-      const pct   = avgConf[item.class] ? `<span style="font-size:10px;color:#bbb;font-family:'DM Mono',monospace;margin-right:4px">${avgConf[item.class]}%</span>` : '';
-      dmgHtml += `
-        <div class="dmg-row">
-          <div class="dmg-dot" style="background:${color}"></div>
-          <div class="dmg-name">${item.class} ×${item.count}</div>
-          ${pct}
-          <div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div>
-        </div>`;
+  let dmgHtml = '';
+  if(r.breakdown.length) {
+    r.breakdown.forEach(item=>{
+      const sev   = SEVERITY[item.class]||'medium';
+      const color = SEV_COLOR[sev]||'#fb923c';
+      const pct   = avgConf[item.class] ? `<span class="dmg-conf">${avgConf[item.class]}%</span>` : '';
+      dmgHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${color}"></div><div class="dmg-name">${item.class} ×${item.count}</div>${pct}<div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>`;
     });
   } else {
-    dmgHtml = '<div style="font-size:12px;color:#ccc;padding:10px 0">No defects found</div>';
+    dmgHtml = `<div style="font-size:12px;color:#ccc;padding:10px 0">—</div>`;
   }
 
-  const repairStr = r.total_low > 0 ? `${sym} ${r.total_low.toLocaleString()} – ${sym} ${r.total_high.toLocaleString()}` : `${sym} 0`;
+  // Claude AI damage section
+  let aiHtml = '';
+  if(aiData && aiData.damage_found && aiData.damage_items.length>0) {
+    aiHtml = `<div class="vc-div"></div>
+    <div class="ai-section-lbl">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#cc0000" stroke-width="1"/><circle cx="5" cy="5" r="1.5" fill="#cc0000"/></svg>
+      ${t('ai_analysis')}
+    </div>`;
+    aiData.damage_items.forEach(item=>{
+      const col = item.severity==='severe'?'#cc0000':item.severity==='moderate'?'#fb923c':'#d4a843';
+      aiHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${col}"></div><div class="dmg-name" style="flex:1">${item.type.replace('_',' ')} · <span style="color:#aaa;font-size:10px">${item.location}</span></div><div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>
+      <div style="font-size:10px;color:#bbb;padding:1px 0 6px 14px;line-height:1.4">${item.description}</div>`;
+    });
+    if(aiData.notes) aiHtml += `<div style="font-size:11px;color:#888;font-style:italic;margin-top:4px;line-height:1.6">${aiData.notes}</div>`;
+  }
 
-  // Merge repair costs: YOLO + Claude
-  const aiRepairMid = aiData && aiData.damage_found ? Math.round((aiData.repair_low + aiData.repair_high) / 2) : 0;
-  const yoloRepairMid = o ? Math.round(o.repair_mid) : 0;
-  const combinedRepairMid = yoloRepairMid + aiRepairMid;
-  const marketValue = o ? Math.round(o.market_value) : 0;
-  const marginPct = o ? Math.round(o.margin_pct) : 15;
-  const marginAmt = marketValue > 0 ? Math.round((marketValue - combinedRepairMid) * marginPct / 100) : 0;
-  const maxOffer  = marketValue > 0 ? Math.max(0, marketValue - combinedRepairMid - marginAmt) : null;
+  // Repair totals
+  const repairStr    = r.total_low>0 ? `${sym} ${r.total_low.toLocaleString()} – ${sym} ${r.total_high.toLocaleString()}` : `${sym} 0`;
+  const aiRepairMid  = aiData && aiData.damage_found ? Math.round((aiData.repair_low+aiData.repair_high)/2) : 0;
+  const yoloRepairMid= o ? Math.round(o.repair_mid) : 0;
+  const combinedMid  = yoloRepairMid + aiRepairMid;
+  const marketVal    = o ? Math.round(o.market_value) : 0;
+  const marginPct    = o ? Math.round(o.margin_pct) : Math.round(state.margin*100);
+  const marginAmt    = marketVal>0 ? Math.round((marketVal-combinedMid)*marginPct/100) : 0;
+  const maxOffer     = marketVal>0 ? Math.max(0, marketVal-combinedMid-marginAmt) : null;
 
-  // Offer
+  // Offer card
   let offerHtml = '';
-  if (maxOffer !== null) {
-    offerHtml = `
-      <div class="offer-card">
-        <div>
-          <div class="oc-label">Maximum Purchase Offer</div>
-          <div class="oc-offer">${sym} ${maxOffer.toLocaleString()}</div>
-          <div class="oc-sub">Recommended dealer bid · ${cname}</div>
-        </div>
-        <div>
-          <div class="oc-div"></div>
-          <div class="oc-row"><span class="oc-rlbl">Market value</span><span class="oc-rval">${sym} ${marketValue.toLocaleString()}</span></div>
-          ${yoloRepairMid > 0 ? `<div class="oc-row"><span class="oc-rlbl">Structural repairs (AI vision)</span><span class="oc-rval-red">− ${sym} ${yoloRepairMid.toLocaleString()}</span></div>` : ''}
-          ${aiRepairMid > 0 ? `<div class="oc-row"><span class="oc-rlbl">Cosmetic repairs (AI analysis)</span><span class="oc-rval-red">− ${sym} ${aiRepairMid.toLocaleString()}</span></div>` : ''}
-          <div class="oc-row"><span class="oc-rlbl">Dealer margin ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>
-          <div class="oc-div"></div>
-          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>YOLO v5 + Claude Vision · 7 damage classes</div>
-        </div>
-      </div>`;
+  if(maxOffer!==null) {
+    offerHtml = `<div class="offer-card">
+      <div class="oc-label">${t('max_offer')}</div>
+      <div class="oc-offer">${sym} ${maxOffer.toLocaleString()}</div>
+      <div class="oc-sub">${t('dealer_bid')} · ${cname}</div>
+      <div class="oc-div"></div>
+      <div class="oc-row"><span class="oc-rlbl">${t('market_value')}</span><span class="oc-rval">${sym} ${marketVal.toLocaleString()}</span></div>
+      ${yoloRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('structural_repairs')}</span><span class="oc-rval-red">− ${sym} ${yoloRepairMid.toLocaleString()}</span></div>`:''}
+      ${aiRepairMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('cosmetic_repairs')}</span><span class="oc-rval-red">− ${sym} ${aiRepairMid.toLocaleString()}</span></div>`:''}
+      <div class="oc-row"><span class="oc-rlbl">${t('dealer_margin')} ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>
+      <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>${t('footer_model')}</div>
+    </div>`;
   } else {
-    offerHtml = `
-      <div class="offer-card">
-        <div>
-          <div class="oc-label">Assessment Complete</div>
-          <div class="oc-offer" style="font-size:32px;margin-top:20px">Damage<br>Detected</div>
-          <div class="oc-sub" style="margin-top:12px">Enter market value to calculate<br>maximum purchase offer</div>
-        </div>
-        <div>
-          <div class="oc-div"></div>
-          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v5 · mAP 0.614 · 7 damage classes</div>
-        </div>
-      </div>`;
+    offerHtml = `<div class="offer-card">
+      <div class="oc-label">${t('max_offer')}</div>
+      <div class="oc-offer" style="font-size:28px;margin-top:16px">${t('damage_found')||'Damage<br>Detected'}</div>
+      <div class="oc-footer" style="margin-top:16px">Autoshot · Vehicle Damage Intelligence<br>${t('footer_model')}</div>
+    </div>`;
   }
 
   document.getElementById('results-content').innerHTML = `
@@ -619,61 +732,46 @@ function renderResults(vehicle, data, aiData, elapsed) {
     ${statusHtml}
     <div class="results-grid">
       <div class="vehicle-card">
-
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
           <div class="vc-make">${makeLine}</div>
-          ${state.plate ? `<div style="font-family:'DM Mono',monospace;font-size:12px;color:#0a0a0a;border:1px solid #e8e8e8;border-radius:5px;padding:3px 10px;letter-spacing:.1em">${state.plate}</div>` : ''}
+          ${state.plate?`<div style="font-family:'DM Mono',monospace;font-size:11px;border:1px solid #e8e8e8;border-radius:4px;padding:3px 8px;letter-spacing:.1em;white-space:nowrap;flex-shrink:0">${state.plate}</div>`:''}
         </div>
         <div class="vc-detail">${detailLine}</div>
         <div class="vc-div"></div>
-        <div class="vc-row"><span class="vc-lbl">Market Value</span><span class="vc-val">${mvStr}</span></div>
-        <div class="vc-row"><span class="vc-lbl">Repair Estimate</span><span class="vc-val-red">${repairStr}</span></div>
+        <div class="vc-row"><span class="vc-lbl">${t('market_value')}</span><span class="vc-val">${mvStr}</span></div>
+        <div class="vc-row"><span class="vc-lbl">${t('repair_estimate')}</span><span class="vc-val-red">${repairStr}</span></div>
         <div class="vc-div"></div>
         ${dmgHtml}
-        ${aiData && aiData.damage_found && aiData.damage_items.length > 0 ? `
-        <div class="vc-div"></div>
-        <div style="font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#bbb;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#cc0000" stroke-width="1"/><circle cx="5" cy="5" r="1.5" fill="#cc0000"/></svg>
-          AI Visual Analysis
-        </div>
-        ${aiData.damage_items.map(item => `
-          <div class="dmg-row">
-            <div class="dmg-dot" style="background:${item.severity==='severe'?'#cc0000':item.severity==='moderate'?'#fb923c':'#d4a843'}"></div>
-            <div class="dmg-name" style="flex:1">${item.type.replace('_',' ')} · <span style="color:#aaa;font-size:11px">${item.location}</span></div>
-            <div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div>
-          </div>
-          <div style="font-size:10px;color:#bbb;padding:2px 0 8px 16px;line-height:1.5">${item.description}</div>
-        `).join('')}
-        ${aiData.notes ? `<div style="font-size:11px;color:#888;font-style:italic;margin-top:6px;line-height:1.6">${aiData.notes}</div>` : ''}
-        ` : ''}
-        <div class="vc-note">${cname} labour rates · Indicative estimates</div>
-        ${vehicle && vehicle.reasoning ? `<div class="vc-div"></div><div style="font-size:11px;color:#888;line-height:1.6;font-style:italic">${vehicle.reasoning}</div>` : ''}
+        ${aiHtml}
+        <div class="vc-note">${cname} ${t('labour')}</div>
+        ${vehicle&&vehicle.reasoning?`<div class="vc-div"></div><div style="font-size:10px;color:#888;line-height:1.6;font-style:italic">${vehicle.reasoning}</div>`:''}
       </div>
       ${offerHtml}
     </div>
-    <div style="display:flex;justify-content:center;gap:12px;margin-top:36px">
-      <button class="analyse-btn" onclick="window.print()" style="background:#fff;color:#0a0a0a;border:1px solid #e0e0e0">
-        ⎙ &nbsp;Print Report
-      </button>
-      <button class="analyse-btn" onclick="resetAssessment()" style="background:#fff;color:#0a0a0a;border:1px solid #e0e0e0">
-        ↺ &nbsp;New Assessment
-      </button>
+    <div class="action-btns">
+      <button class="analyse-btn btn-outline" onclick="window.print()">⎙ ${t('print_report')}</button>
+      <button class="analyse-btn btn-outline" onclick="resetAssessment()">↺ ${t('new_assessment')}</button>
     </div>`;
 }
 
+// ── Reset ─────────────────────────────────────────────────────────────────────
 function resetAssessment() {
-  state.files = [null, null, null, null];
-  [0,1,2,3].forEach(i => {
-    document.getElementById('file-' + i).value = '';
-    const slot = document.getElementById('slot-' + i);
+  state.files = [null,null,null,null];
+  [0,1,2,3].forEach(i=>{
+    document.getElementById('file-'+i).value='';
+    const slot = document.getElementById('slot-'+i);
     slot.classList.remove('filled');
-    if (i === 0) slot.classList.add('active'); else slot.classList.remove('active');
-    renderSlotDefault(i, slot);
+    if(i===0) slot.classList.add('active'); else slot.classList.remove('active');
+    renderSlotDefault(i,slot);
   });
-  document.getElementById('results-section').style.display = 'none';
-  document.getElementById('analyse-btn').disabled = true;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  document.getElementById('results-section').style.display='none';
+  document.getElementById('analyse-btn').disabled=true;
+  updateCounter();
+  window.scrollTo({top:0,behavior:'smooth'});
 }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+updateCounter();
 </script>
 </body>
 </html>

@@ -31,12 +31,15 @@ CONF_DEFAULT  = 0.25
 REPAIR_COSTS = {
     'es': {'dent':(150,400),'scratch':(80,220),'crack':(200,500),'glass shatter':(300,900),'lamp broken':(150,600),'tire flat':(80,200),'paint damage':(200,500)},
     'pt': {'dent':(130,370),'scratch':(70,200),'crack':(180,460),'glass shatter':(270,830),'lamp broken':(140,550),'tire flat':(75,185),'paint damage':(185,460)},
+    'fr': {'dent':(180,450),'scratch':(90,250),'crack':(230,580),'glass shatter':(350,1000),'lamp broken':(180,700),'tire flat':(90,230),'paint damage':(230,580)},
+    'de': {'dent':(200,500),'scratch':(100,280),'crack':(250,620),'glass shatter':(380,1100),'lamp broken':(200,750),'tire flat':(100,250),'paint damage':(250,620)},
+    'nl': {'dent':(170,430),'scratch':(85,235),'crack':(215,540),'glass shatter':(320,950),'lamp broken':(170,650),'tire flat':(85,215),'paint damage':(215,540)},
     'br': {'dent':(800,2200),'scratch':(400,1200),'crack':(1100,2700),'glass shatter':(1600,4900),'lamp broken':(800,3200),'tire flat':(400,1100),'paint damage':(1100,2700)},
     'us': {'dent':(160,430),'scratch':(85,240),'crack':(215,540),'glass shatter':(325,970),'lamp broken':(160,650),'tire flat':(85,215),'paint damage':(215,540)},
     'mx': {'dent':(2900,7800),'scratch':(1600,4300),'crack':(3900,9800),'glass shatter':(5800,17500),'lamp broken':(2900,11700),'tire flat':(1600,3900),'paint damage':(3900,9800)},
 }
-CURRENCY     = {'es':'€','pt':'€','br':'R$','us':'$','mx':'MX$'}
-COUNTRY_NAME = {'es':'Spain','pt':'Portugal','br':'Brazil','us':'United States','mx':'México'}
+CURRENCY     = {'es':'€','pt':'€','fr':'€','de':'€','nl':'€','br':'R$','us':'$','mx':'MX$'}
+COUNTRY_NAME = {'es':'Spain','pt':'Portugal','fr':'France','de':'Germany','nl':'Netherlands','br':'Brazil','us':'United States','mx':'México'}
 
 model = None
 
