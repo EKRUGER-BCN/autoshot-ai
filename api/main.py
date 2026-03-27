@@ -65,6 +65,12 @@ def _read_html(name: str) -> HTMLResponse:
             return HTMLResponse(content=f.read())
     return HTMLResponse(content=f"<h1>{name} not found</h1>", status_code=404)
 
+def _static(name: str, media_type: str):
+    path = os.path.join(os.path.dirname(__file__), name)
+    if os.path.exists(path):
+        return FileResponse(path, media_type=media_type)
+    return JSONResponse(status_code=404, content={"error": f"{name} not found"})
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_landing():
     return _read_html("landing.html")
@@ -72,6 +78,22 @@ async def serve_landing():
 @app.get("/app", response_class=HTMLResponse)
 async def serve_app():
     return _read_html("index.html")
+
+@app.get("/manifest.json")
+async def serve_manifest():
+    return _static("manifest.json", "application/manifest+json")
+
+@app.get("/sw.js")
+async def serve_sw():
+    return _static("sw.js", "application/javascript")
+
+@app.get("/icon.svg")
+async def serve_icon():
+    return _static("icon.svg", "image/svg+xml")
+
+@app.get("/icon-maskable.svg")
+async def serve_icon_maskable():
+    return _static("icon-maskable.svg", "image/svg+xml")
 
 # ── Health ─────────────────────────────────────────────────────────────────────
 @app.get("/health")
