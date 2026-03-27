@@ -209,6 +209,34 @@ Return ONLY the JSON."""
     overall_conditions = [r.get("overall_condition","fair") for r in all_items if r.get("damage_found")]
     notes = [r.get("notes","") for r in all_items if r.get("notes")]
 
+    # Build annotated images with Claude findings overlaid
+    annotated_images = []
+    for file, result in zip(files, all_items):
+        file.seek(0)
+        contents = await file.read()
+        img = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
+        arr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+        findings = result.get("damage_items", [])
+        if findings:
+            h, w = arr.shape[:2]
+            row_h = 28
+            overlay_h = 10 + len(findings) * row_h + 10
+            panel = arr.copy()
+            cv2.rectangle(panel, (0, h - overlay_h), (w, h), (15, 15, 15), -1)
+            cv2.addWeighted(panel, 0.82, arr, 0.18, 0, arr)
+            SEV_COLORS_BGR = {"severe": (0, 0, 200), "moderate": (0, 130, 255), "minor": (0, 200, 255)}
+            y = h - overlay_h + row_h - 4
+            for item in findings:
+                color = SEV_COLORS_BGR.get(item.get("severity", "minor"), (0, 200, 255))
+                label = f"{item.get('type','').replace('_',' ').title()}  {item.get('location','')}"
+                cv2.putText(arr, label, (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.42, color, 1, cv2.LINE_AA)
+                y += row_h
+        _, buf = cv2.imencode('.jpg', arr)
+        annotated_images.append({
+            "filename": file.filename,
+            "image_b64": base64.b64encode(buf).decode("utf-8"),
+        })
+
     return {
         "damage_found": len(merged_items) > 0,
         "damage_items": merged_items,
@@ -218,6 +246,7 @@ Return ONLY the JSON."""
         "currency": sym,
         "overall_condition": overall_conditions[0] if overall_conditions else "good",
         "notes": " | ".join(notes) if notes else None,
+        "annotated_images": annotated_images,
     }
 
 # ── Detect damage ──────────────────────────────────────────────────────────────

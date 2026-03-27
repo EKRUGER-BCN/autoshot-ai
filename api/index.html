@@ -429,6 +429,17 @@ const T = {
   },
 };
 
+// ── Damage class translations ─────────────────────────────────────────────────
+const DMG_T = {
+  en: {dent:'Dent',scratch:'Scratch',crack:'Crack','glass shatter':'Glass Shatter','lamp broken':'Lamp Broken','tire flat':'Flat Tyre','paint damage':'Paint Damage',paint_damage:'Paint Damage',rust:'Rust',glass_damage:'Glass Damage',lamp_damage:'Lamp Damage',tire_damage:'Tyre Damage',other:'Other'},
+  es: {dent:'Abolladura',scratch:'Arañazo',crack:'Grieta','glass shatter':'Cristal Roto','lamp broken':'Faro Roto','tire flat':'Neumático Pinchado','paint damage':'Daño en Pintura',paint_damage:'Daño en Pintura',rust:'Óxido',glass_damage:'Daño en Cristal',lamp_damage:'Faro Dañado',tire_damage:'Neumático Dañado',other:'Otro'},
+  fr: {dent:'Bosse',scratch:'Rayure',crack:'Fissure','glass shatter':'Vitre Brisée','lamp broken':'Feu Cassé','tire flat':'Pneu Crevé','paint damage':'Dommage Peinture',paint_damage:'Dommage Peinture',rust:'Rouille',glass_damage:'Vitre Endommagée',lamp_damage:'Feu Endommagé',tire_damage:'Pneu Endommagé',other:'Autre'},
+  de: {dent:'Delle',scratch:'Kratzer',crack:'Riss','glass shatter':'Glasbruch','lamp broken':'Lampe Defekt','tire flat':'Reifenpanne','paint damage':'Lackschaden',paint_damage:'Lackschaden',rust:'Rost',glass_damage:'Glasschaden',lamp_damage:'Lampenschaden',tire_damage:'Reifenschaden',other:'Sonstiges'},
+  nl: {dent:'Deuk',scratch:'Kras',crack:'Scheur','glass shatter':'Gebroken Glas','lamp broken':'Lamp Kapot','tire flat':'Lekke Band','paint damage':'Lakschade',paint_damage:'Lakschade',rust:'Roest',glass_damage:'Glasschade',lamp_damage:'Lampschade',tire_damage:'Bandschade',other:'Overig'},
+  pt: {dent:'Amolgadela',scratch:'Arranhão',crack:'Fissura','glass shatter':'Vidro Partido','lamp broken':'Farol Partido','tire flat':'Pneu Furado','paint damage':'Dano na Pintura',paint_damage:'Dano na Pintura',rust:'Ferrugem',glass_damage:'Dano no Vidro',lamp_damage:'Farol Danificado',tire_damage:'Pneu Danificado',other:'Outro'},
+};
+function tc(cls){ return (DMG_T[state.lang]||DMG_T.en)[cls] || cls; }
+
 // ── Country → language mapping ────────────────────────────────────────────────
 const COUNTRY_LANG = {es:'es',pt:'pt',fr:'fr',de:'de',nl:'nl',br:'pt',us:'en',mx:'es'};
 const LANG_LABEL   = {en:'EN',es:'ES',fr:'FR',de:'DE',nl:'NL',pt:'PT'};
@@ -631,27 +642,36 @@ function renderResults(vehicle, data, aiData, elapsed) {
   const r     = data.repair;
   const o     = data.offer;
 
-  // Build Claude findings per photo
-  const aiByPhoto = {};
-  if(aiData && aiData.damage_items) {
-    aiData.damage_items.forEach(item=>{
-      const k = item.photo||'';
-      if(!aiByPhoto[k]) aiByPhoto[k]=[];
-      aiByPhoto[k].push(item);
-    });
-  }
+  // Merge YOLO and Claude annotated images — prefer Claude's (has text overlays) with YOLO as fallback
+  const yoloByFile = {};
+  (data.annotated_images||[]).forEach(img=>{ yoloByFile[img.filename]=img.image_b64; });
+  const aiByFile = {};
+  (aiData && aiData.annotated_images||[]).forEach(img=>{ aiByFile[img.filename]=img.image_b64; });
 
-  // Annotated images
+  // Show both: YOLO (bounding boxes) and Claude (text overlay) side by side per photo
   let annHtml = '';
-  if(data.annotated_images && data.annotated_images.length) {
-    const cols = Math.min(data.annotated_images.length,4);
-    annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${Math.min(cols,2)},1fr)">`;
-    data.annotated_images.forEach(img=>{
-      const findings = aiByPhoto[img.filename]||[];
-      const badges = findings.map(f=>`<span class="ann-badge">${f.type.replace('_',' ')} · ${f.location}</span>`).join('');
-      annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${img.image_b64}" alt="${img.filename}"/>${badges?`<div class="ann-badges">${badges}</div>`:''}</div>`;
+  const allFiles = [...new Set([...Object.keys(yoloByFile), ...Object.keys(aiByFile)])];
+  if(allFiles.length) {
+    const cols = Math.min(allFiles.length, 2);
+    annHtml = `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr);margin-bottom:20px">`;
+    allFiles.forEach(fname=>{
+      const yolo = yoloByFile[fname];
+      const ai   = aiByFile[fname];
+      // If both exist, show YOLO (bboxes) — Claude overlay is on the AI card below
+      const src  = yolo || ai;
+      annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${src}" alt="${fname}"/></div>`;
     });
     annHtml += '</div>';
+    // Claude annotated images row (text overlays)
+    if(Object.keys(aiByFile).length) {
+      annHtml += `<div style="font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#bbb;margin-bottom:8px;display:flex;align-items:center;gap:5px"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" stroke="#cc0000" stroke-width="1"/><circle cx="5" cy="5" r="1.5" fill="#cc0000"/></svg>${t('ai_analysis')}</div>`;
+      annHtml += `<div class="ann-grid" style="grid-template-columns:repeat(${cols},1fr);margin-bottom:20px">`;
+      allFiles.forEach(fname=>{
+        const ai = aiByFile[fname];
+        if(ai) annHtml += `<div><img class="ann-img" src="data:image/jpeg;base64,${ai}" alt="${fname}"/></div>`;
+      });
+      annHtml += '</div>';
+    }
   }
 
   // Photo count in results
@@ -683,7 +703,7 @@ function renderResults(vehicle, data, aiData, elapsed) {
       const sev   = SEVERITY[item.class]||'medium';
       const color = SEV_COLOR[sev]||'#fb923c';
       const pct   = avgConf[item.class] ? `<span class="dmg-conf">${avgConf[item.class]}%</span>` : '';
-      dmgHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${color}"></div><div class="dmg-name">${item.class} ×${item.count}</div>${pct}<div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>`;
+      dmgHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${color}"></div><div class="dmg-name">${tc(item.class)} ×${item.count}</div>${pct}<div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>`;
     });
   } else {
     dmgHtml = `<div style="font-size:12px;color:#ccc;padding:10px 0">—</div>`;
@@ -699,7 +719,7 @@ function renderResults(vehicle, data, aiData, elapsed) {
     </div>`;
     aiData.damage_items.forEach(item=>{
       const col = item.severity==='severe'?'#cc0000':item.severity==='moderate'?'#fb923c':'#d4a843';
-      aiHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${col}"></div><div class="dmg-name" style="flex:1">${item.type.replace('_',' ')} · <span style="color:#aaa;font-size:10px">${item.location}</span></div><div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>
+      aiHtml += `<div class="dmg-row"><div class="dmg-dot" style="background:${col}"></div><div class="dmg-name" style="flex:1">${tc(item.type)} · <span style="color:#aaa;font-size:10px">${item.location}</span></div><div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div></div>
       <div style="font-size:10px;color:#bbb;padding:1px 0 6px 14px;line-height:1.4">${item.description}</div>`;
     });
     if(aiData.notes) aiHtml += `<div style="font-size:11px;color:#888;font-style:italic;margin-top:4px;line-height:1.6">${aiData.notes}</div>`;
