@@ -26,7 +26,7 @@ app.add_middleware(
 MODEL_PATH    = os.environ.get("AUTOSHOT_MODEL", "runs/detect/runs/detect/autoshot_combined_v12/weights/best.pt")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLASS_NAMES   = ['dent', 'scratch', 'crack', 'glass shatter', 'lamp broken', 'tire flat', 'paint damage']
-CONF_DEFAULT  = 0.40
+CONF_DEFAULT  = 0.25
 
 REPAIR_COSTS = {
     'es': {'dent':(150,400),'scratch':(80,220),'crack':(200,500),'glass shatter':(300,900),'lamp broken':(150,600),'tire flat':(80,200),'paint damage':(200,500)},

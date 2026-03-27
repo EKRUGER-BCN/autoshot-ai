@@ -475,7 +475,7 @@ async function analyse() {
     const detForm = new FormData();
     files.forEach(f => detForm.append('files', f));
     const marketVal = vehicle ? vehicle.market_value_mid : 0;
-    const url = `/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}&conf=0.40`;
+    const url = `/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`;
     const detResp = await fetch(url, {method:'POST', body: detForm});
     if (!detResp.ok) throw new Error('Detection failed');
     const data = await detResp.json();
@@ -517,14 +517,27 @@ function renderResults(vehicle, data) {
 
   // Damage rows
   let dmgHtml = '';
+  // Build avg confidence per class from detections
+  const confByClass = {};
+  (data.detections || []).forEach(d => {
+    if (!confByClass[d.class_name]) confByClass[d.class_name] = [];
+    confByClass[d.class_name].push(d.confidence);
+  });
+  const avgConf = {};
+  Object.keys(confByClass).forEach(k => {
+    avgConf[k] = Math.round(confByClass[k].reduce((a,b)=>a+b,0)/confByClass[k].length*100);
+  });
+
   if (r.breakdown.length) {
     r.breakdown.forEach(item => {
       const sev   = SEVERITY[item.class] || 'medium';
       const color = SEV_COLOR[sev] || '#fb923c';
+      const pct   = avgConf[item.class] ? `<span style="font-size:10px;color:#bbb;font-family:'DM Mono',monospace;margin-right:4px">${avgConf[item.class]}%</span>` : '';
       dmgHtml += `
         <div class="dmg-row">
           <div class="dmg-dot" style="background:${color}"></div>
           <div class="dmg-name">${item.class} ×${item.count}</div>
+          ${pct}
           <div class="dmg-cost">${sym} ${item.cost_low.toLocaleString()}–${item.cost_high.toLocaleString()}</div>
         </div>`;
     });
@@ -550,7 +563,7 @@ function renderResults(vehicle, data) {
           <div class="oc-row"><span class="oc-rlbl">Repair estimate</span><span class="oc-rval-red">− ${sym} ${Math.round(o.repair_mid).toLocaleString()}</span></div>
           <div class="oc-row"><span class="oc-rlbl">Dealer margin ${Math.round(o.margin_pct)}%</span><span class="oc-rval-red">− ${sym} ${Math.round(o.margin_amount).toLocaleString()}</span></div>
           <div class="oc-div"></div>
-          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v12 · mAP 0.601 · 7 damage classes</div>
+          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v5 · mAP 0.614 · 7 damage classes</div>
         </div>
       </div>`;
   } else {
@@ -563,7 +576,7 @@ function renderResults(vehicle, data) {
         </div>
         <div>
           <div class="oc-div"></div>
-          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v12 · mAP 0.601 · 7 damage classes</div>
+          <div class="oc-footer">Autoshot · Vehicle Damage Intelligence<br>Model v5 · mAP 0.614 · 7 damage classes</div>
         </div>
       </div>`;
   }
@@ -573,6 +586,7 @@ function renderResults(vehicle, data) {
     ${statusHtml}
     <div class="results-grid">
       <div class="vehicle-card">
+
         <div class="vc-make">${makeLine}</div>
         <div class="vc-detail">${detailLine}</div>
         <div class="vc-div"></div>
@@ -581,9 +595,29 @@ function renderResults(vehicle, data) {
         <div class="vc-div"></div>
         ${dmgHtml}
         <div class="vc-note">${cname} labour rates · Indicative estimates</div>
+        ${vehicle && vehicle.reasoning ? `<div class="vc-div"></div><div style="font-size:11px;color:#888;line-height:1.6;font-style:italic">${vehicle.reasoning}</div>` : ''}
       </div>
       ${offerHtml}
+    </div>
+    <div style="display:flex;justify-content:center;margin-top:36px">
+      <button class="analyse-btn" onclick="resetAssessment()" style="background:#fff;color:#0a0a0a;border:1px solid #e0e0e0">
+        ↺ &nbsp;New Assessment
+      </button>
     </div>`;
+}
+
+function resetAssessment() {
+  state.files = [null, null, null, null];
+  [0,1,2,3].forEach(i => {
+    document.getElementById('file-' + i).value = '';
+    const slot = document.getElementById('slot-' + i);
+    slot.classList.remove('filled');
+    if (i === 0) slot.classList.add('active'); else slot.classList.remove('active');
+    renderSlotDefault(i, slot);
+  });
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('analyse-btn').disabled = true;
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
 </script>
 </body>
