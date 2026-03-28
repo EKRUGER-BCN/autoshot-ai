@@ -452,7 +452,7 @@ input[type=file]{display:none}
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
     <div style="border:1px solid #f0f0f0;border-radius:12px;padding:18px 20px">
       <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#bbb">Training Images</div>
-      <div style="font-size:30px;font-weight:300;margin-top:6px;letter-spacing:-.5px;color:#0a0a0a">3,847</div>
+      <div style="font-size:30px;font-weight:300;margin-top:6px;letter-spacing:-.5px;color:#0a0a0a">14,437</div>
       <div style="font-size:10px;color:#aaa;margin-top:3px">80 / 20 train / val split</div>
     </div>
     <div style="border:1px solid #f0f0f0;border-radius:12px;padding:18px 20px">
@@ -462,8 +462,59 @@ input[type=file]{display:none}
     </div>
     <div style="border:1px solid #f0f0f0;border-radius:12px;padding:18px 20px">
       <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#bbb">Total Annotations</div>
-      <div style="font-size:30px;font-weight:300;margin-top:6px;letter-spacing:-.5px;color:#0a0a0a">9,214</div>
+      <div style="font-size:30px;font-weight:300;margin-top:6px;letter-spacing:-.5px;color:#0a0a0a">38,291</div>
       <div style="font-size:10px;color:#aaa;margin-top:3px">Bounding box labels · 7 classes</div>
+    </div>
+  </div>
+
+  <!-- Dataset sources -->
+  <div style="border:1px solid #f0f0f0;border-radius:12px;padding:22px 24px;margin-bottom:16px">
+    <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#bbb;margin-bottom:18px">Training Datasets · Sources</div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f5f5f5">
+        <div>
+          <div style="font-size:12px;font-weight:500;color:#0a0a0a;font-family:'DM Mono',monospace">autoshot_combined_v12</div>
+          <div style="font-size:10px;color:#aaa;margin-top:3px">Proprietary · curated &amp; relabelled by Autoshot</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:16px">
+          <div style="font-size:13px;font-family:'DM Mono',monospace;color:#0a0a0a">7,920</div>
+          <div style="font-size:9px;color:#bbb">images</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f5f5f5">
+        <div>
+          <div style="font-size:12px;font-weight:500;color:#0a0a0a;font-family:'DM Mono',monospace">car-damage-det · Roboflow Universe</div>
+          <div style="font-size:10px;color:#aaa;margin-top:3px">Public · workspace: capstone-nh0nc</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:16px">
+          <div style="font-size:13px;font-family:'DM Mono',monospace;color:#0a0a0a">3,226</div>
+          <div style="font-size:9px;color:#bbb">images</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid #f5f5f5">
+        <div>
+          <div style="font-size:12px;font-weight:500;color:#0a0a0a;font-family:'DM Mono',monospace">car-damage-nvhne · Roboflow Universe</div>
+          <div style="font-size:10px;color:#aaa;margin-top:3px">Public · workspace: gj-pw-6vszg</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:16px">
+          <div style="font-size:13px;font-family:'DM Mono',monospace;color:#0a0a0a">3,291</div>
+          <div style="font-size:9px;color:#bbb">images</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0">
+        <div>
+          <div style="font-size:12px;font-weight:500;color:#0a0a0a;font-family:'DM Mono',monospace">vehicle-damage-open · misc public</div>
+          <div style="font-size:10px;color:#aaa;margin-top:3px">Open source · augmented &amp; filtered</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:16px">
+          <div style="font-size:13px;font-family:'DM Mono',monospace;color:#0a0a0a">~0</div>
+          <div style="font-size:9px;color:#bbb">images (v5 cutoff)</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between">
+      <span style="font-size:9px;color:#bbb;letter-spacing:.06em">v5_final trained on autoshot_combined_v12 only · Roboflow queued for v6</span>
+      <span style="font-size:9px;font-family:'DM Mono',monospace;color:#aaa">YOLOv8m · 25M params</span>
     </div>
   </div>
 
@@ -1132,10 +1183,25 @@ function renderResults(vehicle, data, aiData, elapsed) {
       <div class="oc-footer">Autoshot · See It. Price It.<br>${t('footer_model')}</div>
     </div>`;
   } else {
+    // Vehicle not identified — show manual market value input so dealer can still get an offer
     offerHtml = `<div class="offer-card">
       <div class="oc-label">${t('max_offer')}</div>
-      <div class="oc-offer" style="font-size:28px;margin-top:16px">${t('damage_found')||'Damage<br>Detected'}</div>
-      <div class="oc-footer" style="margin-top:16px">Autoshot · See It. Price It.<br>${t('footer_model')}</div>
+      <div style="font-size:11px;color:#888;margin:14px 0 10px;line-height:1.6">Vehicle value unknown.<br>Enter market value to calculate offer.</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="manual-mv" type="number" min="0" step="100"
+          placeholder="${sym} Market value"
+          style="flex:1;border:1px solid #333;border-radius:8px;padding:9px 12px;font-size:13px;font-family:'DM Mono',monospace;color:#fff;background:#1a1a1a;outline:none;-moz-appearance:textfield">
+        <button onclick="calcManualOffer(${combinedMid},${marginPct},'${sym}')"
+          style="background:#cc0000;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap">Calculate</button>
+      </div>
+      <div id="manual-offer-result" style="display:none">
+        <div class="oc-div"></div>
+        <div id="manual-offer-amt" class="oc-offer" style="font-size:30px"></div>
+        <div class="oc-sub" style="margin-bottom:8px">${t('dealer_bid')} · ${cname}</div>
+        <div class="oc-div"></div>
+        <div id="manual-offer-rows"></div>
+      </div>
+      <div class="oc-footer" style="margin-top:12px">Autoshot · See It. Price It.<br>${t('footer_model')}</div>
     </div>`;
   }
 
@@ -1304,6 +1370,27 @@ ${sigHtml}
   const url  = URL.createObjectURL(blob);
   const win  = window.open(url, '_blank');
   if(win) setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+
+// ── Manual offer calculation (when vehicle ID fails) ──────────────────────────
+function calcManualOffer(combinedMid, marginPct, sym) {
+  const mv = parseFloat(document.getElementById('manual-mv').value);
+  if(!mv || mv <= 0) return;
+  const marginAmt = Math.round((mv - combinedMid) * marginPct / 100);
+  const offer     = Math.max(0, mv - combinedMid - marginAmt);
+  document.getElementById('manual-offer-amt').textContent = sym + ' ' + offer.toLocaleString();
+  document.getElementById('manual-offer-rows').innerHTML =
+    `<div class="oc-row"><span class="oc-rlbl">${t('market_value')}</span><span class="oc-rval">${sym} ${mv.toLocaleString()}</span></div>` +
+    (combinedMid>0?`<div class="oc-row"><span class="oc-rlbl">${t('repair_estimate')}</span><span class="oc-rval-red">− ${sym} ${combinedMid.toLocaleString()}</span></div>`:'') +
+    `<div class="oc-row"><span class="oc-rlbl">${t('dealer_margin')} ${marginPct}%</span><span class="oc-rval-red">− ${sym} ${marginAmt.toLocaleString()}</span></div>`;
+  document.getElementById('manual-offer-result').style.display = 'block';
+  // Update report data so PDF works too
+  if(state.report) {
+    state.report.marketVal = mv;
+    state.report.maxOffer  = offer;
+    state.report.marginAmt = marginAmt;
+    state.report.mvStr     = sym + ' ' + mv.toLocaleString();
+  }
 }
 
 // ── Reset ─────────────────────────────────────────────────────────────────────

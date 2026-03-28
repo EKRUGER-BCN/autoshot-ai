@@ -11,8 +11,24 @@ import os
 import io
 import json
 import requests
+import datetime
+import shutil
 from collections import Counter
 from typing import List
+
+COLLECT_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "collected")
+
+def save_collected(file_bytes: bytes, filename: str):
+    try:
+        day = datetime.date.today().isoformat()
+        dest = os.path.join(COLLECT_DIR, day)
+        os.makedirs(dest, exist_ok=True)
+        ts = datetime.datetime.now().strftime("%H%M%S")
+        safe = "".join(c if c.isalnum() or c in "._-" else "_" for c in filename)
+        with open(os.path.join(dest, f"{ts}_{safe}"), "wb") as f:
+            f.write(file_bytes)
+    except Exception:
+        pass  # never block the request over storage
 
 app = FastAPI(title="Autoshot API", version="0.2.0")
 
@@ -144,7 +160,7 @@ Base market values on current {cname} used car prices ({sym}). Return ONLY the J
                 {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
                 {"type": "text", "text": prompt}
             ]}]},
-            timeout=30
+            timeout=55
         )
         raw = resp.json()["content"][0]["text"].strip().replace("```json","").replace("```","").strip()
         vehicle = json.loads(raw)
@@ -210,7 +226,7 @@ Write all location, description, and notes text in {lang_name}. Return ONLY the 
                     {"type": "image", "source": {"type": "base64", "media_type": "image/jpeg", "data": img_b64}},
                     {"type": "text", "text": prompt}
                 ]}]},
-                timeout=30
+                timeout=55
             )
             raw = resp.json()["content"][0]["text"].strip().replace("```json","").replace("```","").strip()
             result = json.loads(raw)
@@ -302,6 +318,7 @@ async def detect(
 
     for file in files:
         contents = await file.read()
+        save_collected(contents, file.filename)
         img      = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
         img_arr  = np.array(img)
         results  = m.predict(img_arr, conf=conf, verbose=False)[0]
