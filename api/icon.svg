@@ -1,14 +1,52 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#0a0a0a"/>
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cc0000" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Subtle red glow behind center -->
+  <circle cx="256" cy="256" r="120" fill="url(#glow)" filter="url(#soft)"/>
+
   <!-- Outer ring -->
-  <circle cx="256" cy="256" r="180" stroke="#ffffff" stroke-width="18" fill="none"/>
+  <circle cx="256" cy="256" r="185" stroke="#ffffff" stroke-width="14" fill="none" opacity="0.9"/>
+
+  <!-- Tick marks on outer ring -->
+  <line x1="256" y1="56" x2="256" y2="76"  stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+  <line x1="256" y1="436" x2="256" y2="456" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+  <line x1="56"  y1="256" x2="76"  y2="256" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+  <line x1="436" y1="256" x2="456" y2="256" stroke="#ffffff" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Diagonal tick marks (45°) -->
+  <line x1="388" y1="124" x2="374" y2="138" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.4"/>
+  <line x1="124" y1="124" x2="138" y2="138" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.4"/>
+  <line x1="388" y1="388" x2="374" y2="374" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.4"/>
+  <line x1="124" y1="388" x2="138" y2="374" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity="0.4"/>
+
   <!-- Inner ring -->
-  <circle cx="256" cy="256" r="100" stroke="#ffffff" stroke-width="12" fill="none"/>
+  <circle cx="256" cy="256" r="100" stroke="#ffffff" stroke-width="9" fill="none" opacity="0.6"/>
+
+  <!-- Cross hair lines (gap in center) -->
+  <line x1="256" y1="82"  x2="256" y2="210" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity="0.85"/>
+  <line x1="256" y1="302" x2="256" y2="430" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity="0.85"/>
+  <line x1="82"  y1="256" x2="210" y2="256" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity="0.85"/>
+  <line x1="302" y1="256" x2="430" y2="256" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Center dot glow -->
+  <circle cx="256" cy="256" r="42" fill="#cc0000" opacity="0.25" filter="url(#soft)"/>
   <!-- Center dot -->
-  <circle cx="256" cy="256" r="34" fill="#cc0000"/>
-  <!-- Cross hairs -->
-  <line x1="256" y1="56" x2="256" y2="140" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
-  <line x1="256" y1="372" x2="256" y2="456" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
-  <line x1="56" y1="256" x2="140" y2="256" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
-  <line x1="372" y1="256" x2="456" y2="256" stroke="#ffffff" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="28" fill="#cc0000"/>
+  <!-- Center dot highlight -->
+  <circle cx="248" cy="248" r="8" fill="#ff4444" opacity="0.5"/>
 </svg>

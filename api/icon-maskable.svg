@@ -1,15 +1,50 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Full bleed background (maskable — no rounded corners) -->
-  <rect width="512" height="512" fill="#0a0a0a"/>
-  <!-- Outer ring -->
-  <circle cx="256" cy="256" r="160" stroke="#ffffff" stroke-width="16" fill="none"/>
+  <defs>
+    <radialGradient id="bg2" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#cc0000" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#cc0000" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft2">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+
+  <!-- Full bleed background (maskable) -->
+  <rect width="512" height="512" fill="url(#bg2)"/>
+
+  <!-- Subtle red glow -->
+  <circle cx="256" cy="256" r="110" fill="url(#glow2)" filter="url(#soft2)"/>
+
+  <!-- Outer ring (slightly smaller for safe zone) -->
+  <circle cx="256" cy="256" r="165" stroke="#ffffff" stroke-width="13" fill="none" opacity="0.9"/>
+
+  <!-- Tick marks -->
+  <line x1="256" y1="76"  x2="256" y2="94"  stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+  <line x1="256" y1="418" x2="256" y2="436" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+  <line x1="76"  y1="256" x2="94"  y2="256" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+  <line x1="418" y1="256" x2="436" y2="256" stroke="#ffffff" stroke-width="13" stroke-linecap="round"/>
+
+  <!-- Diagonal ticks -->
+  <line x1="372" y1="140" x2="360" y2="152" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+  <line x1="140" y1="140" x2="152" y2="152" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+  <line x1="372" y1="372" x2="360" y2="360" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+  <line x1="140" y1="372" x2="152" y2="360" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+
   <!-- Inner ring -->
-  <circle cx="256" cy="256" r="88" stroke="#ffffff" stroke-width="11" fill="none"/>
-  <!-- Center dot -->
-  <circle cx="256" cy="256" r="30" fill="#cc0000"/>
-  <!-- Cross hairs -->
-  <line x1="256" y1="76" x2="256" y2="152" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
-  <line x1="256" y1="360" x2="256" y2="436" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
-  <line x1="76" y1="256" x2="152" y2="256" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
-  <line x1="360" y1="256" x2="436" y2="256" stroke="#ffffff" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="256" cy="256" r="90" stroke="#ffffff" stroke-width="8" fill="none" opacity="0.6"/>
+
+  <!-- Crosshair lines -->
+  <line x1="256" y1="94"  x2="256" y2="196" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+  <line x1="256" y1="316" x2="256" y2="418" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+  <line x1="94"  y1="256" x2="196" y2="256" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+  <line x1="316" y1="256" x2="418" y2="256" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Center glow + dot -->
+  <circle cx="256" cy="256" r="38" fill="#cc0000" opacity="0.25" filter="url(#soft2)"/>
+  <circle cx="256" cy="256" r="25" fill="#cc0000"/>
+  <circle cx="249" cy="249" r="7" fill="#ff4444" opacity="0.5"/>
 </svg>
