@@ -683,6 +683,8 @@ const T = {
     report_title:'Vehicle Assessment Report', signed_by:'Digitally signed by',
     damage_col:'Damage', type_col:'Type', cost_col:'Est. Cost',
     inspector_placeholder:'Inspector name · leave blank to print without signature',
+    coverage_title:'Vehicle Coverage', coverage_sub:'Surface assessed by AI vision',
+    not_photographed:'Not photographed',
   },
   es: {
     upload_title:'Subir fotos del vehículo', upload_sub:'Fotografía cada lado con claridad · vehículo completo en el encuadre · buena iluminación',
@@ -700,6 +702,8 @@ const T = {
     report_title:'Informe de Evaluación del Vehículo', signed_by:'Firmado digitalmente por',
     damage_col:'Daño', type_col:'Tipo', cost_col:'Coste Est.',
     inspector_placeholder:'Nombre del inspector · dejar en blanco para imprimir sin firma',
+    coverage_title:'Cobertura del Vehículo', coverage_sub:'Superficie evaluada por visión IA',
+    not_photographed:'No fotografiado',
   },
   fr: {
     upload_title:'Télécharger les photos du véhicule', upload_sub:'Photographiez chaque côté clairement · véhicule entier dans le cadre · bonne lumière',
@@ -717,6 +721,8 @@ const T = {
     report_title:'Rapport d\'Évaluation du Véhicule', signed_by:'Signé numériquement par',
     damage_col:'Dommage', type_col:'Type', cost_col:'Coût Est.',
     inspector_placeholder:'Nom de l\'inspecteur · laisser vide pour imprimer sans signature',
+    coverage_title:'Couverture du Véhicule', coverage_sub:'Surface évaluée par vision IA',
+    not_photographed:'Non photographié',
   },
   de: {
     upload_title:'Fahrzeugfotos hochladen', upload_sub:'Fotografieren Sie jede Seite klar · gesamtes Fahrzeug im Bild · gute Beleuchtung',
@@ -734,6 +740,8 @@ const T = {
     report_title:'Fahrzeugbewertungsbericht', signed_by:'Digital signiert von',
     damage_col:'Schaden', type_col:'Typ', cost_col:'Gesch. Kosten',
     inspector_placeholder:'Name des Inspektors · leer lassen für Druck ohne Unterschrift',
+    coverage_title:'Fahrzeugabdeckung', coverage_sub:'Oberfläche durch KI-Vision bewertet',
+    not_photographed:'Nicht fotografiert',
   },
   nl: {
     upload_title:'Voertuigfoto\'s uploaden', upload_sub:'Fotografeer elke kant duidelijk · volledig voertuig in beeld · goede belichting',
@@ -751,6 +759,8 @@ const T = {
     report_title:'Voertuigbeoordelingsrapport', signed_by:'Digitaal ondertekend door',
     damage_col:'Schade', type_col:'Type', cost_col:'Gesch. Kosten',
     inspector_placeholder:'Naam inspecteur · leeg laten om te printen zonder handtekening',
+    coverage_title:'Voertuigdekking', coverage_sub:'Oppervlak beoordeeld door AI-visie',
+    not_photographed:'Niet gefotografeerd',
   },
   pt: {
     upload_title:'Carregar fotos do veículo', upload_sub:'Fotografe cada lado claramente · veículo completo no enquadramento · boa iluminação',
@@ -768,6 +778,8 @@ const T = {
     report_title:'Relatório de Avaliação do Veículo', signed_by:'Assinado digitalmente por',
     damage_col:'Dano', type_col:'Tipo', cost_col:'Custo Est.',
     inspector_placeholder:'Nome do inspetor · deixe em branco para imprimir sem assinatura',
+    coverage_title:'Cobertura do Veículo', coverage_sub:'Superfície avaliada por visão IA',
+    not_photographed:'Não fotografado',
   },
   it: {
     upload_title:'Carica le foto del veicolo', upload_sub:'Fotografa ogni lato chiaramente · veicolo intero nell\'inquadratura · buona illuminazione',
@@ -785,6 +797,8 @@ const T = {
     report_title:'Rapporto di Valutazione del Veicolo', signed_by:'Firmato digitalmente da',
     damage_col:'Danno', type_col:'Tipo', cost_col:'Costo Est.',
     inspector_placeholder:'Nome ispettore · lasciare vuoto per stampare senza firma',
+    coverage_title:'Copertura del Veicolo', coverage_sub:'Superficie valutata da visione IA',
+    not_photographed:'Non fotografato',
   },
 };
 
@@ -1014,12 +1028,15 @@ async function analyse() {
     // Step 2 — YOLO + Claude in parallel
     showProgress(2);
     const detForm = new FormData(), aiForm = new FormData();
+    // Build slot list matching the uploaded files in order
+    const SLOT_KEYS = ['front','rear','left','right'];
+    const uploadedSlots = SLOT_KEYS.filter((_,i) => state.files[i] !== null);
     files.forEach(f=>{ detForm.append('files',f); aiForm.append('files',f); });
     const marketVal = vehicle ? vehicle.market_value_mid : 0;
 
     const [detResp, aiResp] = await Promise.all([
       fetch(`/detect?country=${state.country}&margin=${state.margin}&market_value=${marketVal}`,{method:'POST',body:detForm,signal:controller.signal}),
-      fetch(`/analyze?country=${state.country}&lang=${state.lang}`,{method:'POST',body:aiForm,signal:controller.signal}),
+      fetch(`/analyze?country=${state.country}&lang=${state.lang}&slots=${uploadedSlots.join(',')}`,{method:'POST',body:aiForm,signal:controller.signal}),
     ]);
 
     if(!detResp.ok){
@@ -1175,9 +1192,45 @@ function renderResults(vehicle, data, aiData, elapsed) {
     </div>`;
   }
 
+  // Coverage card
+  const SLOT_LABEL_MAP = {front:t('slot_front'),rear:t('slot_rear'),left:t('slot_left'),right:t('slot_right')};
+  let coverageHtml = '';
+  if(aiData && aiData.coverage) {
+    const cov = aiData.coverage;
+    const pct = cov.overall_pct;
+    const barColor = pct>=80?'#22c55e':pct>=50?'#f59e0b':'#cc0000';
+    const panels = cov.panels||[];
+    const panelBars = panels.map(p=>{
+      const lbl = SLOT_LABEL_MAP[p.slot]||p.slot;
+      const pg  = p.pct;
+      const bc  = pg>=80?'#22c55e':pg>=50?'#f59e0b':pg>0?'#cc0000':'#e8e8e8';
+      const note = p.note && pg<80 ? `<span style="font-size:9px;color:#aaa;margin-left:6px">${p.note}</span>` : '';
+      return `<div style="margin-bottom:9px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:#0a0a0a">${lbl}${note}</span>
+          <span style="font-size:11px;font-family:'DM Mono',monospace;color:${bc}">${pg>0?pg+'%':t('not_photographed')}</span>
+        </div>
+        <div style="height:4px;background:#f0f0f0;border-radius:2px"><div style="width:${pg}%;height:100%;background:${bc};border-radius:2px;transition:width .6s ease"></div></div>
+      </div>`;
+    }).join('');
+    coverageHtml = `<div style="border:1px solid #f0f0f0;border-radius:12px;padding:18px 20px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:#bbb">${t('coverage_title')}</div>
+          <div style="font-size:10px;color:#aaa;margin-top:2px">${t('coverage_sub')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:32px;font-weight:300;letter-spacing:-.5px;color:${barColor};line-height:1">${pct}%</div>
+        </div>
+      </div>
+      ${panelBars}
+    </div>`;
+  }
+
   document.getElementById('results-content').innerHTML = `
     ${annHtml}
     ${statusHtml}
+    ${coverageHtml}
     <div class="results-grid">
       <div class="vehicle-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">

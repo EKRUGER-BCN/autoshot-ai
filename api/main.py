@@ -176,6 +176,7 @@ async def analyze(
     files: List[UploadFile] = File(...),
     country: str = Query(default="es"),
     lang: str = Query(default="en"),
+    slots: str = Query(default=""),  # comma-separated slot names e.g. "front,rear,left,right"
 ):
     if not ANTHROPIC_KEY:
         return JSONResponse(status_code=200, content={"error": "No ANTHROPIC_API_KEY set", "analysis": None})
@@ -185,9 +186,14 @@ async def analyze(
     costs    = REPAIR_COSTS.get(country, REPAIR_COSTS["es"])
     lang_name = LANG_NAME.get(lang, "English")
 
+    slot_list   = [s.strip() for s in slots.split(",")] if slots else []
+    ALL_SLOTS   = ["front", "rear", "left", "right"]
+    SLOT_LABELS = {"front": "front", "rear": "rear", "left": "left side", "right": "right side"}
+
     all_items = []
     all_imgs  = []  # store processed PIL images for annotation later
-    for file in files:
+    for idx, file in enumerate(files):
+        slot_name  = SLOT_LABELS.get(slot_list[idx], "vehicle") if idx < len(slot_list) else "vehicle"
         contents  = await file.read()
         img_fixed = ImageOps.exif_transpose(Image.open(io.BytesIO(contents))).convert("RGB")
         all_imgs.append(img_fixed)
@@ -197,7 +203,11 @@ async def analyze(
 
         prompt = f"""You are a professional automotive damage assessor with 20 years of experience evaluating used cars for dealerships in {cname}. Respond in {lang_name}.
 
+This is the {slot_name} photo of the vehicle.
+
 Carefully examine this vehicle photo and identify ALL visible damage — including subtle scratches, paint chips, scuffs, and surface damage that automated systems might miss.
+
+Also assess photo coverage: how much of the vehicle's {slot_name} surface is clearly visible and in frame (0–100).
 
 Respond ONLY with raw JSON — no markdown, no preamble:
 {{
@@ -212,11 +222,13 @@ Respond ONLY with raw JSON — no markdown, no preamble:
     }}
   ],
   "repair_urgency": "none|cosmetic|soon|urgent",
-  "notes": "One sentence overall assessment."
+  "notes": "One sentence overall assessment.",
+  "coverage_pct": 85,
+  "coverage_note": "Brief note if coverage is poor, else empty string."
 }}
 
 If no damage is visible respond with damage_found: false and empty damage_items array.
-Write all location, description, and notes text in {lang_name}. Return ONLY the JSON."""
+Write all location, description, notes, and coverage_note text in {lang_name}. Return ONLY the JSON."""
 
         try:
             resp = requests.post(
@@ -263,6 +275,25 @@ Write all location, description, and notes text in {lang_name}. Return ONLY the 
     overall_conditions = [r.get("overall_condition","fair") for r in all_items if r.get("damage_found")]
     notes = [r.get("notes","") for r in all_items if r.get("notes")]
 
+    # Build coverage report
+    coverage_panels = []
+    for idx, r in enumerate(all_items):
+        slot = slot_list[idx] if idx < len(slot_list) else f"photo_{idx+1}"
+        coverage_panels.append({
+            "slot": slot,
+            "pct": int(r.get("coverage_pct", 0)),
+            "note": r.get("coverage_note", ""),
+        })
+    # Add 0% for slots that weren't photographed
+    photographed_slots = set(slot_list[:len(files)])
+    for s in ALL_SLOTS:
+        if s not in photographed_slots:
+            coverage_panels.append({"slot": s, "pct": 0, "note": "Not photographed"})
+    # Sort in canonical order
+    order = {s: i for i, s in enumerate(ALL_SLOTS)}
+    coverage_panels.sort(key=lambda p: order.get(p["slot"], 99))
+    overall_coverage = round(sum(p["pct"] for p in coverage_panels) / max(len(ALL_SLOTS), 1))
+
     # Build annotated images with Claude findings overlaid
     annotated_images = []
     for file, img, result in zip(files, all_imgs, all_items):
@@ -298,6 +329,7 @@ Write all location, description, and notes text in {lang_name}. Return ONLY the 
         "overall_condition": overall_conditions[0] if overall_conditions else "good",
         "notes": " | ".join(notes) if notes else None,
         "annotated_images": annotated_images,
+        "coverage": {"overall_pct": overall_coverage, "panels": coverage_panels},
     }
 
 # ── Detect damage ──────────────────────────────────────────────────────────────
