@@ -41,12 +41,13 @@ streamlit run app.py
 | Variable | Description |
 |---|---|
 | `ANTHROPIC_API_KEY` | Required for vehicle identification (Claude Vision) |
-| `AUTOSHOT_MODEL` | Path to YOLO `.pt` weights (optional — falls back to `runs/detect/runs/detect/autoshot_combined_v12/weights/best.pt`, then `autoshot_v4_final`) |
+| `AUTOSHOT_MODEL` | Path to YOLO `.pt` weights (optional — falls back to `runs/detect/runs/detect/autoshot_v5_final/weights/best.pt`, then `autoshot_v4_final`) |
 
 ## Key Technical Details
 
 - **Claude model used:** `claude-sonnet-4-20250514` (called via raw HTTP, not SDK)
 - **YOLO classes (7):** dent, scratch, crack, glass shatter, lamp broken, tire flat, paint damage
 - **Detection confidence threshold:** 0.40
+- **Active model:** `autoshot_v5_final` (epoch 41, mAP50: 0.501) at `runs/detect/runs/detect/autoshot_v5_final/weights/best.pt`
 - **Model weights** (`.pt` files) are gitignored — must be provided separately
 - Repair costs are hardcoded per country/damage class in both `api/main.py` and `streamlit_app/app.py` — update both if changing pricing

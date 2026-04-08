@@ -63,7 +63,7 @@ model = None
 def get_model():
     global model
     if model is None:
-        for p in [MODEL_PATH, "runs/detect/runs/detect/autoshot_v4_final/weights/best.pt"]:
+        for p in [MODEL_PATH, "runs/detect/runs/detect/autoshot_v5_final/weights/best.pt", "runs/detect/runs/detect/autoshot_v4_final/weights/best.pt"]:
             if os.path.exists(p):
                 model = YOLO(p)
                 break

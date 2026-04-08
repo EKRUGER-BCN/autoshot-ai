@@ -290,6 +290,9 @@ st.markdown("""
 
 st.markdown('<div class="as-page">', unsafe_allow_html=True)
 
+if model is None:
+    st.error("Model not loaded. Set the AUTOSHOT_MODEL environment variable to your .pt weights path before running.", icon="🚫")
+
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP 1 — Configure
 # ══════════════════════════════════════════════════════════════════════════════
@@ -299,7 +302,7 @@ st.markdown("""
   <div class="as-step-title">Configure assessment</div>
 </div>""", unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3, gap="medium")
+col1, col2, col3, col4 = st.columns(4, gap="medium")
 with col1:
     country = st.selectbox("Market", list(CNAME.keys()), format_func=lambda x: CNAME[x], key="country")
     st.markdown(f"""<div style="display:flex;align-items:center;gap:8px;margin-top:-8px">
@@ -310,6 +313,9 @@ with col2:
     plate = st.text_input("License Plate", placeholder="1234 ABC", key="plate")
 with col3:
     margin = st.selectbox("Dealer Margin", [10,12,15,18,20,25], index=2, format_func=lambda x: f"{x}%", key="margin")
+with col4:
+    conf_threshold = st.slider("Detection Sensitivity", min_value=0.15, max_value=0.65, value=0.30, step=0.05, key="conf",
+                               help="Lower = more detections (may include false positives). Higher = only confident detections.")
 
 sym = SYM[country]
 
@@ -414,7 +420,7 @@ if analyse or st.session_state.get("show_results"):
         st.session_state["show_results"] = False
 
     elif model is None:
-        st.error("Model not found. Check AUTOSHOT_MODEL environment variable.")
+        st.error("Model not found. Set the AUTOSHOT_MODEL environment variable to your .pt weights path.")
 
     else:
         # Claude Vision
@@ -428,18 +434,21 @@ if analyse or st.session_state.get("show_results"):
         default_market = vd["market_value_mid"] if vd and vd.get("market_value_mid") else 12000
 
         # YOLO inference
-        all_classes, all_confs, annotated_imgs = [], [], []
+        all_detections, annotated_imgs = [], []
         with st.spinner("Detecting damage..."):
             for f in all_uploads:
                 f.seek(0)
                 img = Image.open(f).convert("RGB")
                 arr = np.array(img)
-                res = model.predict(arr, conf=0.40, verbose=False)[0]
+                res = model.predict(arr, conf=conf_threshold, verbose=False)[0]
                 if res.boxes and len(res.boxes) > 0:
-                    all_classes += [CLASS_NAMES[int(c)] if int(c) < len(CLASS_NAMES) else f"class_{int(c)}" for c in res.boxes.cls.cpu().numpy()]
-                    all_confs += list(res.boxes.conf.cpu().numpy())
+                    for cls, conf_val in zip(res.boxes.cls.cpu().numpy(), res.boxes.conf.cpu().numpy()):
+                        cls_name = CLASS_NAMES[int(cls)] if int(cls) < len(CLASS_NAMES) else f"class_{int(cls)}"
+                        all_detections.append((cls_name, float(conf_val)))
                 ann = res.plot(line_width=2, pil=False, img=arr.copy())
                 annotated_imgs.append((f.name, cv2.cvtColor(ann, cv2.COLOR_BGR2RGB)))
+
+        all_classes = [d[0] for d in all_detections]
 
         if annotated_imgs:
             img_cols = st.columns(min(len(annotated_imgs), 4), gap="small")
@@ -477,14 +486,25 @@ if analyse or st.session_state.get("show_results"):
             status_html = '<div class="as-clean">✓ No damage detected</div>' if not all_classes else f'<div class="as-damaged">⚠ {len(all_classes)} defect{"s" if len(all_classes)>1 else ""} detected across {len(all_uploads)} photo{"s" if len(all_uploads)>1 else ""}</div>'
             repair_str  = f"{sym} 0" if not all_classes else f"{sym} {total_low:,} – {total_high:,}"
 
+            # Build per-class avg confidence
+            conf_by_class = {}
+            for cls_name, conf_val in all_detections:
+                conf_by_class.setdefault(cls_name, []).append(conf_val)
+            avg_conf = {k: int(sum(v)/len(v)*100) for k, v in conf_by_class.items()}
+
             dmg_html = ""
             if all_classes:
                 for cls, count in sorted(counts.items(), key=lambda x: -x[1]):
                     _, color = SEVERITY.get(cls, ('Medium','#fb923c'))
                     low, high = costs_table.get(cls, (100,300))
-                    dmg_html += f'<div class="as-dmg-row"><div class="as-dmg-dot" style="background:{color}"></div><div class="as-dmg-name">{cls} ×{count}</div><div class="as-dmg-cost">{sym} {low*count:,}–{high*count:,}</div></div>'
+                    pct = avg_conf.get(cls, 0)
+                    dmg_html += f'<div class="as-dmg-row"><div class="as-dmg-dot" style="background:{color}"></div><div class="as-dmg-name">{cls} ×{count}</div><span style="font-size:10px;color:#bbb;font-family:\'DM Mono\',monospace;margin-right:6px">{pct}%</span><div class="as-dmg-cost">{sym} {low*count:,}–{high*count:,}</div></div>'
             else:
                 dmg_html = '<div style="font-size:12px;color:#ccc;padding:10px 0">No defects found</div>'
+
+            reasoning_html = ""
+            if vd and vd.get("reasoning"):
+                reasoning_html = f'<div class="as-vc-div"></div><div style="font-size:11px;color:#888;line-height:1.6;font-style:italic">{vd["reasoning"]}</div>'
 
             st.markdown(f"""
             {status_html}
@@ -497,6 +517,7 @@ if analyse or st.session_state.get("show_results"):
               <div class="as-vc-div"></div>
               {dmg_html}
               <div class="as-note">{CNAME[country]} labour rates · Indicative estimates</div>
+              {reasoning_html}
             </div>""", unsafe_allow_html=True)
 
         with right_col:
@@ -517,9 +538,20 @@ if analyse or st.session_state.get("show_results"):
               </div>
             </div>""", unsafe_allow_html=True)
 
+        st.markdown('<div style="height:32px"></div>', unsafe_allow_html=True)
+        _, reset_col, _ = st.columns([2, 1, 2])
+        with reset_col:
+            if st.button("↺  New Assessment", key="reset"):
+                for key in ["show_results", "vehicle_data"]:
+                    st.session_state.pop(key, None)
+                st.rerun()
+
 st.markdown('</div>', unsafe_allow_html=True)
 
-model_name = os.path.basename(os.path.dirname(os.path.dirname(model_path))) if model_path else "No model"
+try:
+    model_name = os.path.basename(os.path.dirname(os.path.dirname(model_path))) if model_path else "No model loaded"
+except Exception:
+    model_name = "No model loaded"
 st.markdown(f"""
 <div class="as-footer">
   <span>Autoshot · Vehicle Damage Intelligence</span>
