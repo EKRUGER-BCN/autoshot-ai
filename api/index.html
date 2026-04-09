@@ -1146,7 +1146,14 @@ function renderResults(vehicle, data, aiData, elapsed) {
   }
 
   // Repair totals
-  const repairStr    = r.total_low>0 ? `${sym} ${r.total_low.toLocaleString()} – ${sym} ${r.total_high.toLocaleString()}` : `${sym} 0`;
+  const yoloLow      = r.total_low  || 0;
+  const yoloHigh     = r.total_high || 0;
+  console.log('DEBUG aiData:', JSON.stringify(aiData && {damage_found: aiData.damage_found, repair_low: aiData.repair_low, repair_high: aiData.repair_high}));
+  const aiLow        = aiData && aiData.damage_found ? (aiData.repair_low  || 0) : 0;
+  const aiHigh       = aiData && aiData.damage_found ? (aiData.repair_high || 0) : 0;
+  const combinedLow  = yoloLow  + aiLow;
+  const combinedHigh = yoloHigh + aiHigh;
+  const repairStr    = combinedLow>0 ? `${sym} ${combinedLow.toLocaleString()} – ${sym} ${combinedHigh.toLocaleString()}` : `${sym} 0`;
   const aiRepairMid  = aiData && aiData.damage_found ? Math.round((aiData.repair_low+aiData.repair_high)/2) : 0;
   const yoloRepairMid= o ? Math.round(o.repair_mid) : 0;
   const combinedMid  = yoloRepairMid + aiRepairMid;

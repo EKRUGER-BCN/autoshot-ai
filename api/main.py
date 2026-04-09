@@ -42,7 +42,7 @@ app.add_middleware(
 MODEL_PATH    = os.environ.get("AUTOSHOT_MODEL", "models/autoshot_v6_best.pt")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLASS_NAMES   = ['dent', 'scratch', 'crack', 'glass shatter', 'lamp broken', 'tire flat', 'paint damage']
-CONF_DEFAULT  = 0.25
+CONF_DEFAULT  = 0.55
 
 REPAIR_COSTS = {
     'es': {'dent':(150,400),'scratch':(80,220),'crack':(200,500),'glass shatter':(300,900),'lamp broken':(150,600),'tire flat':(80,200),'paint damage':(200,500)},
@@ -133,24 +133,34 @@ async def identify(
     cname    = COUNTRY_NAME.get(country, "Spain")
     lang_name = LANG_NAME.get(lang, "English")
 
-    prompt = f"""You are an automotive expert. Analyse this vehicle photo and respond ONLY with raw JSON — no markdown, no preamble.
+    prompt = f"""You are a professional automotive appraiser with deep knowledge of used car markets worldwide.
+Analyse this vehicle photo and respond ONLY with raw JSON — no markdown, no preamble, no explanation.
 
 Return this exact structure:
 {{
   "make": "e.g. Volkswagen",
   "model": "e.g. Golf",
   "year_range": "e.g. 2019-2020",
-  "trim": "e.g. 1.6 TDI",
+  "trim": "e.g. 1.6 TDI Highline",
   "fuel": "e.g. Diesel",
   "body": "e.g. Hatchback",
+  "mileage_estimate": "e.g. 60,000-80,000 km",
   "market_value_low": 11000,
   "market_value_high": 14500,
   "market_value_mid": 12500,
   "reasoning": "One sentence on valuation written in {lang_name}."
 }}
 
-Be precise on year_range — maximum 2 years span based on visible facelift/generation details.
-Base market values on current {cname} used car prices ({sym}). Return ONLY the JSON."""
+Critical instructions:
+- Be precise on year_range — maximum 2 years span based on visible facelift/generation details
+- market_value_low, market_value_mid and market_value_high MUST reflect CURRENT {cname} used car retail prices in {sym}
+- For Brazil: use current Tabela FIPE + Webmotors/OLX market prices in R$
+- For Spain/Portugal: use current Coches.net/Standvirtual prices in €
+- For USA: use current KBB/CarGurus prices in $
+- For Mexico: use current Kavak/MercadoLibre prices in MX$
+- DO NOT use European prices for non-European markets
+- DO NOT convert currencies — return values in the local currency {sym}
+- Return ONLY the JSON, nothing else."""
 
     try:
         resp = requests.post(
