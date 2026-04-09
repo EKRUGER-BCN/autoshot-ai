@@ -39,7 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH    = os.environ.get("AUTOSHOT_MODEL", "runs/detect/runs/detect/autoshot_combined_v12/weights/best.pt")
+MODEL_PATH    = os.environ.get("AUTOSHOT_MODEL", "models/autoshot_v6_best.pt")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CLASS_NAMES   = ['dent', 'scratch', 'crack', 'glass shatter', 'lamp broken', 'tire flat', 'paint damage']
 CONF_DEFAULT  = 0.25
